@@ -45,7 +45,11 @@ class StocksListActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        vpAdapter.pageList[viewPager2.currentItem].recAdapter.updateData() // pull new favor
+        try {
+            vpAdapter.pageList[viewPager2.currentItem].recAdapter.updateData() // pull new favor
+        } catch (e: UninitializedPropertyAccessException) {
+            Log.e("StockListActivity", "onRestart: UninitializedPropertyAccessException ")
+        }
     }
 
     private fun setUpSearchPanel() {

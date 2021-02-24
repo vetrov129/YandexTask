@@ -105,7 +105,7 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
         buttonBuyFor.text = "${buttonBuyFor.text} ${holder.price}"
     }
 
-    private fun periodClicked(view: TextView, list: ArrayList<ChartLine>?, getter: (String) -> ArrayList<ChartLine>) {
+    private fun periodClicked(view: TextView, list: ArrayList<ChartLine>?, getter: (String) -> ArrayList<ChartLine>?) {
         buttonSelected.setBackgroundResource(R.drawable.shape_period_not_selected_background)
         buttonSelected.setTextColor(resources.getColor(R.color.colorBlack))
 
@@ -118,10 +118,10 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
         waitDataAndUpdate(list, getter) // if the data did not have time to load, it will be loaded out of turn
     }
 
-    private fun waitDataAndUpdate(list: ArrayList<ChartLine>?, getter: (String) -> ArrayList<ChartLine>) {
+    private fun waitDataAndUpdate(list: ArrayList<ChartLine>?, getter: (String) -> ArrayList<ChartLine>?) {
         var prises = ArrayList<ChartLine>()
         if (list == null) {
-            Thread { prises = getter(holder.ticker) }.apply {
+            Thread { prises = getter(holder.ticker) ?: ArrayList() }.apply {
                 start()
                 join()
             }

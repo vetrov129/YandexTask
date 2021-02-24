@@ -43,8 +43,8 @@ class StockHolder(
     fun pullData() {
         val quote = App.connector.getQuote(ticker)
         try {
-            change = DataFormatter.getChange(quote.open, quote.close, currency)
-            price = DataFormatter.addCurrency(quote.open, currency, true)
+            change = DataFormatter.getChange(quote?.open, quote?.close, currency)
+            price = DataFormatter.addCurrency(quote?.open, currency, true)
         } catch (e: FileNotFoundException) {
             Log.e("StockHolder", "pullData: price not found for $ticker")
         }

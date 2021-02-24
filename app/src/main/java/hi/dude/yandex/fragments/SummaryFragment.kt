@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,18 +32,23 @@ class SummaryFragment(val ticker: String, val image: Bitmap): Fragment() {
 
         cardSite.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(tvSite.text.toString())
-            startActivity(intent)
+            try {
+                intent.data = Uri.parse(tvSite.text.toString())
+                startActivity(intent)
+            } catch (e: NullPointerException) {
+                Log.e("Summary", "onViewCreated: ", e)
+            }
+
         }
     }
 
     private fun setUpText(summary: Summary) {
-        tvDescription.text = summary.description
-        tvIndustry.text = summary.industry
-        tvCeo.text = summary.ceo
+        tvDescription.text = summary.description ?: ""
+        tvIndustry.text = summary.industry ?: ""
+        tvCeo.text = summary.ceo ?: ""
         tvCountry.text = DataFormatter.getCountryByCode(summary.country)
         tvIpo.text = DataFormatter.toPrettyDate(summary.ipoDate)
-        tvSite.text = summary.website
+        tvSite.text = summary.website ?: ""
 
         setTextVisibility(View.VISIBLE)
     }

@@ -99,10 +99,14 @@ class ApiConnector {
         return gson.fromJson(json, type)
     }
 
-    fun getQuote(ticker: String?): Quote {
+    fun getQuote(ticker: String?): Quote? {
         val type = object : TypeToken<ArrayList<Quote?>?>() {}.type
         val json = getJson(REQUEST.QUOTE, ticker)
-        return (gson.fromJson(json, type) as ArrayList<Quote>)[0]
+        return try {
+                (gson.fromJson(json, type) as ArrayList<Quote>)[0]
+        } catch (e: IndexOutOfBoundsException) {
+            null
+        }
     }
 
     fun getQueryResult(query: String, limit: Int): ArrayList<QueryResult> {
@@ -140,12 +144,12 @@ class ApiConnector {
         return deleteOlderThen(gson.fromJson(json, type), previousSixMonth())
     }
 
-    fun getYearChartData(ticker: String): ArrayList<ChartLine> {
+    fun getYearChartData(ticker: String): ArrayList<ChartLine>? {
         val json = getJson(REQUEST.CHART_YEAR, ticker, fromYear(), toYear())
         return gson.fromJson(json, Historical::class.java).lines
     }
 
-    fun getAllChartData(ticker: String): ArrayList<ChartLine> {
+    fun getAllChartData(ticker: String): ArrayList<ChartLine>? {
         val json = getJson(REQUEST.CHART_YEAR, ticker)
         return gson.fromJson(json, Historical::class.java).lines
     }
@@ -153,7 +157,12 @@ class ApiConnector {
     fun getSummary(ticker: String): Summary {
         val type = object : TypeToken<ArrayList<Summary?>?>() {}.type
         val json = getJson(REQUEST.SUMMARY, ticker)
-        return (gson.fromJson(json, type) as ArrayList<Summary>)[0]
+        return try {
+            (gson.fromJson(json, type) as ArrayList<Summary>)[0]
+        } catch (e: IndexOutOfBoundsException) {
+            Summary("", "", "", "", "", "")
+        }
+
     }
 
     fun getNews(ticker: String, limit: Int = 50): ArrayList<NewsItem> {

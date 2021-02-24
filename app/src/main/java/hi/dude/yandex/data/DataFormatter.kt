@@ -12,6 +12,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
@@ -26,7 +27,8 @@ class DataFormatter {
             "FI", "FR", "GR", "SI", "CY", "MT", "SK", "EE", "LV", "LT"
         )
 
-        fun getChange(new: Double, old: Double, currency: String): String {
+        fun getChange(new: Double?, old: Double?, currency: String?): String {
+            if (new == null || old == null || currency == null) return ""
             var result = ""
             result += if (new - old < 0) "-" else "+"
             result += addCurrency(new - old, currency, false)
@@ -35,7 +37,8 @@ class DataFormatter {
             return result
         }
 
-        fun addCurrency(volume: Double, currency: String, long: Boolean): String {
+        fun addCurrency(volume: Double?, currency: String?, long: Boolean): String {
+            if (volume == null) return ""
             var result = ""
             if (currency == "USD" || currency == "US") result += "$"
             result +=
@@ -139,27 +142,34 @@ class DataFormatter {
 
         fun previousSixMonth(): LocalDateTime = LocalDateTime.now() - Period.of(0, 6, 0)
 
-        fun deleteOlderThen(array: ArrayList<ChartLine>, date: LocalDateTime): ArrayList<ChartLine> {
+        fun deleteOlderThen(array: ArrayList<ChartLine>?, date: LocalDateTime): ArrayList<ChartLine> {
+            if (array == null) return ArrayList<ChartLine>()
             array.removeIf { LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) < date }
             return array
         }
 
-        fun toPrettyDate(date: String): String {
-            return if (date.length > 10) {
-                val ldate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                ldate.format(DateTimeFormatter.ofPattern("HH:mm d MMM yyyy", Locale.ENGLISH)).toLowerCase()
-            } else {
-                val ldate = LocalDate.parse(date)
-                ldate.format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH)).toLowerCase()
+        fun toPrettyDate(date: String?): String {
+            if (date == null) return ""
+            return try {
+                if (date.length > 10) {
+                    val ldate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    ldate.format(DateTimeFormatter.ofPattern("HH:mm d MMM yyyy", Locale.ENGLISH)).toLowerCase()
+                } else {
+                    val ldate = LocalDate.parse(date)
+                    ldate.format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH)).toLowerCase()
+                }
+            } catch (e: DateTimeParseException) {
+                return ""
             }
         }
 
-        fun getCountryByCode(code: String): String {
+        fun getCountryByCode(code: String?): String {
             return when (code) {
                 "US" -> "United States ($code)"
                 "CN" -> "China ($code)"
                 "NL" -> "Netherlands ($code)"
                 "RU" -> "Russia ($code)"
+                null -> ""
                 else -> code
             }
         }
