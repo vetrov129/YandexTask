@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/containerStock"
+            android:background="@color/colorPrimary">
+
+        <androidx.cardview.widget.CardView
+                android:id="@+id/cardImage"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+        <ImageView
+                android:id="@+id/ivImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"/>
+
+        </androidx.cardview.widget.CardView>
+        <TextView
+                android:id="@+id/tvTickerStock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="YNDX"
+                android:textSize="18sp"
+                android:fontFamily="@font/montserrat"
+                android:textFontWeight="700"
+                android:textColor="@color/colorBlack"
+                app:layout_constraintStart_toEndOf="@id/cardImage"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="12dp"
+                android:lineHeight="24dp"/>
+
+        <ImageView
+                android:id="@+id/ivStarStock"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_gray_star"
+                app:layout_constraintStart_toEndOf="@id/tvTickerStock"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="17dp"
+                android:layout_marginStart="6dp" />
+
+        <TextView
+                android:id="@+id/tvCompanyStock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yandex, LLC"
+                app:layout_constraintStart_toEndOf="@id/cardImage"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="38dp"
+                android:layout_marginStart="12dp"
+                android:fontFamily="@font/montserrat"
+                android:textFontWeight="600"
+                android:textColor="@color/colorBlack"
+                android:lineHeight="16dp"
+                android:textSize="12sp"/>
+
+        <TextView
+                android:id="@+id/tvPriceStock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4 764,6 p"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="17dp"
+                android:fontFamily="@font/montserrat"
+                android:textFontWeight="700"
+                android:textColor="@color/colorBlack"
+                android:textSize="18sp"
+                android:lineHeight="24dp"/>
+
+        <TextView
+                android:id="@+id/tvDiffStock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+55 p (1,15%)"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="14dp"
+                android:layout_marginEnd="12dp"
+                android:fontFamily="@font/montserrat"
+                android:textFontWeight="600"
+                android:textColor="@color/colorGreen"
+                android:textSize="12sp"
+                android:lineHeight="16dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

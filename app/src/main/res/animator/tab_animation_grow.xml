@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <objectAnimator
+        android:duration="250"
+        android:propertyName="textSize"
+        android:valueFrom="18"
+        android:valueTo="28"
+        android:interpolator="@android:anim/decelerate_interpolator"/>
+
+    <objectAnimator
+            android:duration="250"
+            android:propertyName="lineHeight"
+            android:valueFrom="24dp"
+            android:valueTo="32dp"
+            android:interpolator="@android:anim/decelerate_interpolator"/>
+
+    <objectAnimator
+            android:duration="400"
+            android:propertyName="textColor"
+            android:valueFrom="@color/colorGray"
+            android:valueTo="@color/colorBlack"
+            android:interpolator="@android:anim/decelerate_interpolator"/>
+
+    <objectAnimator
+            android:duration="250"
+            android:propertyName="paddingBottom"
+            android:valueFrom="4dp"
+            android:valueTo="0dp"
+            android:interpolator="@android:anim/decelerate_interpolator"/>
+
+</set>

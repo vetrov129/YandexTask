@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary">
+
+        <TextView
+                android:id="@+id/labelDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/description"
+                style="@style/SummaryLargeText"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/test_description"
+                app:layout_constraintTop_toBottomOf="@+id/labelDescription"
+                app:layout_constraintStart_toStartOf="parent"
+                style="@style/SummarySmallText"
+                android:textFontWeight="500"
+                android:layout_marginTop="8dp"/>
+
+        <androidx.cardview.widget.CardView
+                android:id="@+id/cardIndustry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDescription"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginHorizontal="16dp"
+                app:cardBackgroundColor="@color/colorBG">
+
+            <TextView
+                    android:id="@+id/labelIndustry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/industry"
+                    style="@style/SummaryLargeText"/>
+
+            <TextView
+                    android:id="@+id/tvIndustry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/test_description"
+                    app:layout_constraintTop_toBottomOf="@+id/labelIndustry"
+                    app:layout_constraintStart_toStartOf="parent"
+                    style="@style/SummarySmallText"
+                    android:layout_marginTop="36dp"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cardCeo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardIndustry"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginHorizontal="16dp">
+
+            <TextView
+                    android:id="@+id/labelCeo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ceo"
+                    style="@style/SummaryLargeText"
+                    />
+
+            <TextView
+                    android:id="@+id/tvCeo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/test_description"
+                    app:layout_constraintTop_toBottomOf="@+id/labelCeo"
+                    app:layout_constraintStart_toStartOf="parent"
+                    style="@style/SummarySmallText"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cardCountry"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardCeo"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginHorizontal="16dp"
+                app:cardBackgroundColor="@color/colorBG">
+
+            <TextView
+                    android:id="@+id/labelCountry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/country"
+                    style="@style/SummaryLargeText"/>
+
+            <TextView
+                    android:id="@+id/tvCountry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/test_description"
+                    app:layout_constraintTop_toBottomOf="@+id/labelCountry"
+                    app:layout_constraintStart_toStartOf="parent"
+                    style="@style/SummarySmallText"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cardIpo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardCountry"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginHorizontal="16dp">
+
+
+            <TextView
+                    android:id="@+id/labelIpo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ipo_date"
+                    style="@style/SummaryLargeText"
+                    />
+
+            <TextView
+                    android:id="@+id/tvIpo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/test_description"
+                    app:layout_constraintTop_toBottomOf="@+id/labelIpo"
+                    app:layout_constraintStart_toStartOf="parent"
+                    style="@style/SummarySmallText"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cardSite"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardIpo"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginHorizontal="16dp"
+                app:cardBackgroundColor="@color/colorBG"
+                android:layout_marginBottom="16dp">
+
+            <TextView
+                    android:id="@+id/labelSite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/website"
+                    style="@style/SummaryLargeText"/>
+
+            <TextView
+                    android:id="@+id/tvSite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/test_description"
+                    style="@style/SummarySmallText"/>
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -1,0 +1,79 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="actionBarSize">120dp</item>
+    </style>
+
+    <style name="MenuItemSelected">
+        <item name="android:textSize">28sp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textFontWeight" tools:ignore="NewApi">700</item>
+        <item name="android:lineHeight" tools:ignore="NewApi">32dp</item>
+        <item name="android:textColor">@color/colorBlack</item>
+    </style>
+
+    <style name="MenuItemNotSelected">
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textFontWeight" tools:ignore="NewApi">700</item>
+        <item name="android:lineHeight" tools:ignore="NewApi">24dp</item>
+        <item name="android:textColor">@color/colorGray</item>
+    </style>
+    
+    <style name="PeriodButtonNotSelected">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingVertical">14dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/colorBlack</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontWeight">600</item>
+        <item name="android:lineHeight" tools:ignore="NewApi">16dp</item>
+        <item name="android:background">@drawable/shape_period_not_selected_background</item>
+    </style>
+
+    <style name="SummarySmallText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textFontWeight" tools:ignore="NewApi">600</item>
+        <item name="android:lineHeight" tools:ignore="NewApi">16dp</item>
+        <item name="android:textColor">@color/colorBlack</item>
+        <item name="android:layout_marginTop">36dp</item>
+<!--        <item name="android:layout_marginStart">25dp</item>-->
+        <item name="android:paddingHorizontal">16dp</item>
+<!--        <item name="android:layout_marginEnd">16dp</item>-->
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+
+    <style name="SummaryLargeText">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textFontWeight" tools:ignore="NewApi">700</item>
+        <item name="android:lineHeight" tools:ignore="NewApi">24dp</item>
+        <item name="android:textColor">@color/colorBlack</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+    </style>
+
+    <style name="PeriodButtonSelected">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingVertical">14dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontWeight">600</item>
+        <item name="android:lineHeight" tools:ignore="NewApi">16dp</item>
+        <item name="android:background">@drawable/shape_period_selected_background</item>
+    </style>
+
+</resources>

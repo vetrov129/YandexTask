@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="120dp">
+
+    <TextView
+            android:id="@+id/tvTickerCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_ticker"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="18dp"
+            android:fontFamily="@font/montserrat"
+            android:textColor="@color/colorBlack"
+            android:textFontWeight="700"
+            android:textSize="18sp"
+            android:lineHeight="24dp"/>
+
+    <TextView
+            android:id="@+id/tvCompanyCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_company"
+            app:layout_constraintTop_toBottomOf="@id/tvTickerCard"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/colorBlack"
+            android:textSize="12sp"
+            android:fontFamily="@font/montserrat"
+            android:textFontWeight="600"
+            android:lineHeight="16dp"/>
+
+    <ImageButton
+            android:id="@+id/ibBackCard"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/colorTransparent"
+            android:src="@drawable/ic_back"
+            android:paddingEnd="26dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"/>
+
+    <ImageButton
+            android:id="@+id/ibStarCard"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@color/colorTransparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_black_star"
+            android:paddingStart="25dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"/>
+
+    <TextView
+            android:id="@+id/tabChart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/chart"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/montserrat"
+            android:textColor="@color/colorBlack"
+            android:textSize="18dp"
+            android:textFontWeight="700"
+            android:lineHeight="24dp"/>
+
+    <TextView
+            android:id="@+id/tabSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/summary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tabChart"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="20dp"
+            android:textSize="14sp"
+            android:fontFamily="@font/montserrat"
+            android:textFontWeight="600"
+            android:textColor="@color/colorGray"
+            android:lineHeight="20dp" />
+
+    <TextView
+            android:id="@+id/tabNews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/news"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tabSummary"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="20dp"
+            android:textSize="14sp"
+            android:fontFamily="@font/montserrat"
+            android:textFontWeight="600"
+            android:textColor="@color/colorGray"
+            android:lineHeight="20dp"/>
+
+<!--    <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/key_executives"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/tvNews"-->
+<!--            android:layout_marginBottom="12dp"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:textSize="14sp"-->
+<!--            android:fontFamily="@font/montserrat"-->
+<!--            android:textFontWeight="600"-->
+<!--            android:textColor="@color/colorGray"-->
+<!--            android:lineHeight="20dp"/>-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

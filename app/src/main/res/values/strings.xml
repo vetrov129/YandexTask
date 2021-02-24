@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Yandex</string>
+    <string name="stocks">Stocks</string>
+    <string name="favorite">Favorite</string>
+    <string name="find_company_or_ticker">" Find company or ticker"</string>
+    <string name="popular_requests">Popular requests</string>
+    <string name="you_ve_searched_for_this">You\'ve searched for this</string>
+    <string name="test_bubble">test bubble</string>
+    <string name="show_more">Show more</string>
+    <string name="test_ticker">AAPL</string>
+    <string name="test_company">Apple Inc.</string>
+    <string name="chart">Chart</string>
+    <string name="summary">Summary</string>
+    <string name="news">News</string>
+    <string name="key_executives">Key executives</string>
+    <string name="test_price">$131.93</string>
+    <string name="test_change">+$0.12 (1.15%)</string>
+    <string name="d">D</string>
+    <string name="w">W</string>
+    <string name="m">M</string>
+    <string name="six_m">6M</string>
+    <string name="one_year">1Y</string>
+    <string name="all">All</string>
+    <string name="buy_for">Buy for</string>
+    <string name="test_date">3 nov 2020</string>
+    <string name="description">Description</string>
+    <string name="test_description">test description</string>
+    <string name="industry">Industry</string>
+    <string name="ceo">Ceo</string>
+    <string name="country">Country</string>
+    <string name="ipo_date">Ipo date</string>
+    <string name="website">Website</string>
+    <string name="test_title">Title test</string>
+    <string name="text">text</string>
+    <string name="to_website">To website</string>
+</resources>

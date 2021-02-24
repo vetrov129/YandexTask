@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorAccent">#1A1A1A</color>
+
+    <color name="colorBlack">#1A1A1A</color>
+    <color name="colorGreen">#24B25D</color>
+    <color name="colorRed">#B22424</color>
+    <color name="colorGray">#BABABA</color>
+    <color name="colorBG">#F0F4F7</color>
+
+    <color name="colorGradientStart">#00DCDCDC</color>
+    <color name="colorGradientEnd">#EBEBEB</color>
+
+    <color name="colorTransparent">#00000000</color>
+
+
+    <color name="colorTestPageRed">#DC6161</color>
+    <color name="colorTestPageYellow">#D5D878</color>
+</resources>

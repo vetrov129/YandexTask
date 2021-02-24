@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        app:cardCornerRadius="20dp"
+        android:layout_marginEnd="4dp"
+        app:cardBackgroundColor="@color/colorBG"
+        app:cardElevation="0dp">
+
+<!--    android:layout_marginBottom="8dp"-->
+
+
+    <TextView
+            android:id="@+id/tvBubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_bubble"
+            android:layout_marginHorizontal="16dp"
+            android:layout_gravity="center"
+            android:background="@color/colorBG"
+            android:fontFamily="@font/montserrat"
+            android:textColor="@color/colorBlack"
+            android:textFontWeight="600"
+            android:textSize="12sp"
+            android:lineHeight="16dp"/>
+
+</androidx.cardview.widget.CardView>
