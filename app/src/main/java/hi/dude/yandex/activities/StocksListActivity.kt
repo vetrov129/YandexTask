@@ -145,7 +145,7 @@ class StocksListActivity : AppCompatActivity() {
             }
             (rvSearchedBubbles.adapter as RecyclerBubblesAdapter).apply {
                 setSearchedBubbles()
-                notifyDataSetChanged()
+                runOnUiThread { notifyDataSetChanged() }
             }
         }.start()
     }

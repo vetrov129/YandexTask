@@ -47,11 +47,12 @@ class DataFormatter {
             return result
         }
 
-        private fun cutCompany(company: String): String {
-            return if (company.length > 24) company.substring(0, 24) + "..." else company
+        private fun cutCompany(company: String?): String? {
+            return if (company != null && company.length > 24) company.substring(0, 24) + "..." else company
         }
 
-        fun companyToQuery(company: String): String  {
+        fun companyToQuery(company: String?): String  {
+            if (company == null) return ""
             return company.split(Regex("(\\h|\\.)"))[0]
         }
 
