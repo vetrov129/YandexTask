@@ -148,7 +148,6 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
         } catch (e: NullPointerException) { // if activity closed before the end of the thread
             Log.e("ChartFragment", "pullPrices: ${e.message}")
         }
-
     }.start()
 
     private fun setUpChart() {
@@ -182,7 +181,6 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
         set.lineWidth = 2f
         set.setDrawCircleHole(false)
         set.setDrawFilled(true)
-        set.fillFormatter = IFillFormatter { _, _ -> chart.axisLeft.axisMinimum }
         set.fillDrawable = getDrawable(this.context!!, R.drawable.chart_gradient)
         set.setDrawCircles(false)
         set.setDrawValues(false)
