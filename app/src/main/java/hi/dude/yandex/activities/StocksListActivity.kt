@@ -52,6 +52,13 @@ class StocksListActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (edSearch.hasFocus())
+            searchBackClicked()
+        else
+            super.onBackPressed()
+    }
+
     private fun setUpSearchPanel() {
         ibClearSearch.visibility = View.GONE
         ibBackSearch.visibility = View.GONE
