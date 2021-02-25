@@ -173,5 +173,13 @@ class DataFormatter {
                 else -> code
             }
         }
+
+        fun cutDescription(des: String?): String {
+            if (des == null) return ""
+
+            return if (des.length > 400)
+                des.substring(0, 400) + "..."
+            else des
+        }
     }
 }

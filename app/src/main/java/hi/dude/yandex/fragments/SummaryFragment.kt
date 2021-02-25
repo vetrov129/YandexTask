@@ -47,7 +47,15 @@ class SummaryFragment(val ticker: String, val image: Bitmap): Fragment() {
     }
 
     private fun setUpText(summary: Summary) {
-        tvDescription.text = summary.description ?: ""
+        tvDescription.text = DataFormatter.cutDescription(summary.description)
+        if (summary.description != null && summary.description.length > 400)
+            summaryShowMore.visibility = View.VISIBLE
+        else
+            summaryShowMore.visibility = View.GONE
+
+        summaryShowMore.setOnClickListener { showMoreClicked(summary) }
+
+//        tvDescription.text = summary.description ?: ""
         tvIndustry.text = summary.industry ?: ""
         tvCeo.text = summary.ceo ?: ""
         tvCountry.text = DataFormatter.getCountryByCode(summary.country)
@@ -66,4 +74,8 @@ class SummaryFragment(val ticker: String, val image: Bitmap): Fragment() {
         cardSite.visibility = visibility
     }
 
+    private fun showMoreClicked(summary: Summary) {
+        summaryShowMore.visibility = View.GONE
+        tvDescription.text = summary.description ?: ""
+    }
 }
