@@ -228,14 +228,13 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
         // selected coordinates
         val x = chart.getPixelForValues(entry.x.toFloat(), entry.y, chart.axisLeft.axisDependency).x
         val y = chart.getPixelForValues(entry.x.toFloat(), entry.y, chart.axisLeft.axisDependency).y
-
+        // margin of chart
         val dp80 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80f, resources.displayMetrics)
-        val dp6 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, resources.displayMetrics)
         // move main pixel to new place
         val params = ConstraintLayout.LayoutParams(1, 1)
         params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
         params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-        params.setMargins(x.toInt() + dp6.toInt(), y.toInt() + dp80.toInt(), 0, 0)
+        params.setMargins(x.toInt(), y.toInt() + dp80.toInt(), 0, 0)
         mainPixel.layoutParams = params
 
         balloonTop.visibility = View.VISIBLE
