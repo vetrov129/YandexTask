@@ -94,7 +94,7 @@ class StocksListActivity : AppCompatActivity() {
                 val adapter = rvResults.adapter as RecyclerResultsAdapter
                 adapter.stocks = result
             } catch (e: IndexOutOfBoundsException) {
-                Log.e("Activity", "runSearch: IndexOutOfBoundsException ${e.message}")
+                Log.e("StockListActivity", "runSearch: IndexOutOfBoundsException ${e.message}")
             }
         }.start()
     }
@@ -144,7 +144,7 @@ class StocksListActivity : AppCompatActivity() {
         Thread {
             try {
                 App.getQueryDao().save(UserQuery(query, System.currentTimeMillis()))
-            } catch (e: SQLiteConstraintException) {
+            } catch (e: SQLiteConstraintException) { // query already exists, update time for sorting
                 App.getQueryDao().updateDate(UserQuery(query, System.currentTimeMillis()))
             }
             (rvSearchedBubbles.adapter as RecyclerBubblesAdapter).apply {
@@ -210,7 +210,8 @@ class StocksListActivity : AppCompatActivity() {
         ibSearch.visibility = View.VISIBLE
         tabsContainer.visibility = View.VISIBLE
 
-        (viewPager2.adapter as StockPagerAdapter).pageList[viewPager2.currentItem].recAdapter.updateData() // pull new favors
+        // pull new favors
+        (viewPager2.adapter as StockPagerAdapter).pageList[viewPager2.currentItem].recAdapter.updateData()
     }
 
     private fun searchClearClicked() {

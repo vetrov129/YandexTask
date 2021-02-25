@@ -2,6 +2,7 @@ package hi.dude.yandex.fragments
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,8 +29,12 @@ class NewsFragment(val ticker: String): Fragment() {
         adapter = RecyclerNewsAdapter(news, context as Activity)
         rvNews.adapter = adapter
         Thread {
-            news = App.connector.getNews(ticker)
-            (context as Activity).runOnUiThread { adapter.news = news }
+            try {
+                news = App.connector.getNews(ticker)
+                (context as Activity).runOnUiThread { adapter.news = news }
+            } catch (e: NullPointerException) { // if activity closed before the end of the thread
+                Log.e("NewsFragment", "onViewCreated: ${e.message}")
+            }
         }.start()
 
     }

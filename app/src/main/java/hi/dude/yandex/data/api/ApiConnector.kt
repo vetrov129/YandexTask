@@ -72,6 +72,7 @@ class ApiConnector {
     private fun updateKey() {
         keyIndex++
         API_KEY = "apikey=${keyArray[keyIndex]}"
+        Log.i(TAG, "updateKey: key ${keyIndex + 1}/${keyArray.size}")
     }
 
 
@@ -119,7 +120,7 @@ class ApiConnector {
         }
     }
 
-    fun getDayChartData(ticker: String): ArrayList<ChartLine> {
+    fun getDayChartData(ticker: String): ArrayList<ChartLine> {  // TODO: 25.02.2021 crash JsonSyntaxException
         val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
         val json = getJson(REQUEST.CHART_DAY, ticker)
         return deleteOlderThen(gson.fromJson(json, type), previousDay())

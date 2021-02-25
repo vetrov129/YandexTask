@@ -26,8 +26,12 @@ class SummaryFragment(val ticker: String, val image: Bitmap): Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setTextVisibility(View.GONE)
         Thread {
-            val summary = App.connector.getSummary(ticker)
-            (context as Activity).runOnUiThread { setUpText(summary)  }
+            try {
+                val summary = App.connector.getSummary(ticker)
+                (context as Activity).runOnUiThread { setUpText(summary)  }
+            } catch (e: NullPointerException) { // if activity closed before the end of the thread
+                Log.e("SummaryFragment", "onViewCreated: ${e.message}")
+            }
         }.start()
 
         cardSite.setOnClickListener {

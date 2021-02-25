@@ -38,7 +38,7 @@ class App : Application() {
 
         fun checkIsFavor(ticker: String): Boolean {
             return favors.any { it.ticker == ticker }
-        }
+        } // TODO: 25.02.2021 сделать HashSet по тикеру
 
         fun updateStars() {
             holders.forEach { it.isFavor = checkIsFavor(it.ticker) }

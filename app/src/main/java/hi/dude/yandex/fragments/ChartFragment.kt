@@ -2,6 +2,7 @@ package hi.dude.yandex.fragments
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +46,7 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        pullFirst()
+        pullFirstPrices()
         pullPrices()
         setUpBalloon()
         setUpChart()
@@ -59,13 +60,18 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
         }
     }
 
-    private fun pullFirst() = Thread {
-        pricesWeek = App.connector.getWeekChartData(holder.ticker)
-        if (chart.data.getDataSetByLabel("", false).entryCount == 0) {
-            setChartData(pricesWeek)
-            currentPrices = pricesWeek!!
-            chart.invalidate()
+    private fun pullFirstPrices() = Thread {
+        try {
+            pricesWeek = App.connector.getWeekChartData(holder.ticker)
+            if (chart.data.getDataSetByLabel("", false).entryCount == 0) {
+                setChartData(pricesWeek)
+                currentPrices = pricesWeek!!
+                chart.invalidate()
+            }
+        } catch (e: NullPointerException) { // if activity closed before the end of the thread
+            Log.e("ChartFragment", "pullFirstPrices: ${e.message}")
         }
+
     }.start()
 
     private fun setUpPeriodButtons() {
@@ -132,12 +138,17 @@ class ChartFragment(private val holder: StockHolder, val change: String) : Fragm
     }
 
     private fun pullPrices() = Thread {
-        if (pricesDay == null) pricesDay = App.connector.getDayChartData(holder.ticker)
+        try {
+            if (pricesDay == null) pricesDay = App.connector.getDayChartData(holder.ticker)
 //        pricesWeek = App.connector.getWeekChartData(holder.ticker)     // received at start
-        if (pricesMonth == null) pricesMonth = App.connector.getMonthChartData(holder.ticker)
-        if (pricesSixMonth == null) pricesSixMonth = App.connector.getSixMonthChartData(holder.ticker)
-        if (pricesYear == null) pricesYear = App.connector.getYearChartData(holder.ticker)
-        if (pricesAll == null) pricesAll = App.connector.getAllChartData(holder.ticker)
+            if (pricesMonth == null) pricesMonth = App.connector.getMonthChartData(holder.ticker)
+            if (pricesSixMonth == null) pricesSixMonth = App.connector.getSixMonthChartData(holder.ticker)
+            if (pricesYear == null) pricesYear = App.connector.getYearChartData(holder.ticker)
+            if (pricesAll == null) pricesAll = App.connector.getAllChartData(holder.ticker)
+        } catch (e: NullPointerException) { // if activity closed before the end of the thread
+            Log.e("ChartFragment", "pullPrices: ${e.message}")
+        }
+
     }.start()
 
     private fun setUpChart() {
