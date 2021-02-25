@@ -70,9 +70,13 @@ class ApiConnector {
     private val gson = Gson()
 
     private fun updateKey() {
-        keyIndex++
-        API_KEY = "apikey=${keyArray[keyIndex]}"
-        Log.i(TAG, "updateKey: key ${keyIndex + 1}/${keyArray.size}")
+        try {
+            keyIndex++
+            API_KEY = "apikey=${keyArray[keyIndex]}"
+            Log.i(TAG, "updateKey: key ${keyIndex + 1}/${keyArray.size}")
+        } catch (e: IndexOutOfBoundsException) {
+            Log.e(TAG, "updateKey: the keys are out, daily request limit exceeded")
+        }
     }
 
 
