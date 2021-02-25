@@ -12,9 +12,11 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".activities.StockCardActivity">
+        <activity android:name=".activities.StockCardActivity"
+                  android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".activities.StocksListActivity">
+        <activity android:name=".activities.StocksListActivity"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
