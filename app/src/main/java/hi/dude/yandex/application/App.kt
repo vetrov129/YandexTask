@@ -10,6 +10,7 @@ import hi.dude.yandex.data.StockHolder
 import hi.dude.yandex.data.room.DaoGetter
 import hi.dude.yandex.data.room.FavorStockDao
 import hi.dude.yandex.data.room.QueryDao
+import java.net.UnknownHostException
 
 class App : Application() {
 
@@ -47,7 +48,11 @@ class App : Application() {
         fun getPopularCompany(count: Int = 20): ArrayList<String> {
             val companies = ArrayList<String>()
             for (i in 0 until count) {
-                companies.add(DataFormatter.companyToQuery(stocks[i].company))
+                try {
+                    companies.add(DataFormatter.companyToQuery(stocks[i].company))
+                } catch (e: IndexOutOfBoundsException) {
+                    // empty
+                }
             }
             return companies
         }

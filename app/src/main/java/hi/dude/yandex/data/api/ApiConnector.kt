@@ -13,6 +13,7 @@ import hi.dude.yandex.data.DataFormatter.Companion.toYear
 import hi.dude.yandex.data.api.models.*
 import java.io.FileNotFoundException
 import java.net.URL
+import java.net.UnknownHostException
 
 class ApiConnector {
     private companion object {
@@ -89,7 +90,13 @@ class ApiConnector {
             }
             url += API_KEY
             Log.i(TAG, "getJson: $url")
-            val json = URL(url).readText()
+            var json = ""
+            try {
+                json = URL(url).readText()
+            } catch (e: UnknownHostException) {
+                return ""
+            }
+
 
             if (json == NEED_UPDATE_KEY_RESPONSE)   // key change if the limit is exceeded
                 updateKey()
@@ -101,14 +108,14 @@ class ApiConnector {
     fun getStockList(): ArrayList<Stock> {
         val type = object : TypeToken<ArrayList<Stock?>?>() {}.type
         val json = getJson(REQUEST.TOP_STOCKS, null)
-        return gson.fromJson(json, type)
+        return gson.fromJson(json, type) ?: ArrayList()
     }
 
     fun getQuote(ticker: String?): Quote? {
         val type = object : TypeToken<ArrayList<Quote?>?>() {}.type
         val json = getJson(REQUEST.QUOTE, ticker)
         return try {
-                (gson.fromJson(json, type) as ArrayList<Quote>)[0]
+            (gson.fromJson(json, type) as ArrayList<Quote>)[0]
         } catch (e: IndexOutOfBoundsException) {
             null
         }
@@ -118,45 +125,44 @@ class ApiConnector {
         val type = object : TypeToken<ArrayList<QueryResult?>?>() {}.type
         return try {
             val json = getJson(REQUEST.SEARCH, null, Pair("query", query), Pair("limit", "$limit"))
-            gson.fromJson(json, type)
+            gson.fromJson(json, type) ?: ArrayList()
         } catch (e: FileNotFoundException) {
             ArrayList()
         }
     }
 
-    fun getDayChartData(ticker: String): ArrayList<ChartLine> {  // TODO: 25.02.2021 crash JsonSyntaxException
+    fun getDayChartData(ticker: String): ArrayList<ChartLine> {
         val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
         val json = getJson(REQUEST.CHART_DAY, ticker)
-        return deleteOlderThen(gson.fromJson(json, type), previousDay())
-
+        return deleteOlderThen(gson.fromJson(json, type) ?: ArrayList(), previousDay())
     }
 
     fun getWeekChartData(ticker: String): ArrayList<ChartLine> {
         val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
         val json = getJson(REQUEST.CHART_WEEK, ticker)
-        return deleteOlderThen(gson.fromJson(json, type), previousWeek())
+        return deleteOlderThen(gson.fromJson(json, type) ?: ArrayList(), previousWeek())
     }
 
     fun getMonthChartData(ticker: String): ArrayList<ChartLine> {
         val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
         val json = getJson(REQUEST.CHART_MONTH, ticker)
-        return deleteOlderThen(gson.fromJson(json, type), previousMonth())
+        return deleteOlderThen(gson.fromJson(json, type) ?: ArrayList(), previousMonth())
     }
 
     fun getSixMonthChartData(ticker: String): ArrayList<ChartLine> {
         val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
         val json = getJson(REQUEST.CHART_SIX_MONTH, ticker)
-        return deleteOlderThen(gson.fromJson(json, type), previousSixMonth())
+        return deleteOlderThen(gson.fromJson(json, type) ?: ArrayList(), previousSixMonth())
     }
 
     fun getYearChartData(ticker: String): ArrayList<ChartLine>? {
         val json = getJson(REQUEST.CHART_YEAR, ticker, fromYear(), toYear())
-        return gson.fromJson(json, Historical::class.java).lines
+        return gson.fromJson(json, Historical::class.java)?.lines
     }
 
     fun getAllChartData(ticker: String): ArrayList<ChartLine>? {
         val json = getJson(REQUEST.CHART_YEAR, ticker)
-        return gson.fromJson(json, Historical::class.java).lines
+        return gson.fromJson(json, Historical::class.java)?.lines
     }
 
     fun getSummary(ticker: String): Summary {
@@ -166,6 +172,8 @@ class ApiConnector {
             (gson.fromJson(json, type) as ArrayList<Summary>)[0]
         } catch (e: IndexOutOfBoundsException) {
             Summary("", "", "", "", "", "")
+        } catch (e :NullPointerException) {
+            Summary("", "", "", "", "", "")
         }
 
     }
@@ -173,6 +181,6 @@ class ApiConnector {
     fun getNews(ticker: String, limit: Int = 50): ArrayList<NewsItem> {
         val type = object : TypeToken<ArrayList<NewsItem?>?>() {}.type
         val json = getJson(REQUEST.NEWS, null, Pair("tickers", ticker), Pair("limit", "$limit"))
-        return gson.fromJson(json, type)
+        return gson.fromJson(json, type) ?: ArrayList()
     }
 }

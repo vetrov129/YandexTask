@@ -85,6 +85,7 @@ class DataFormatter {
         }
 
         fun getStockHolders(stocks: List<FavorStock>): ArrayList<StockHolder> {
+            Log.i("", "getStockHolders: ")
             val holders = ArrayList<StockHolder>()
             for (stock in stocks) {
                 holders.add(
