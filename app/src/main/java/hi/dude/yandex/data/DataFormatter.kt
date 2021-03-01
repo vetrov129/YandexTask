@@ -29,6 +29,7 @@ class DataFormatter {
 
         fun getChange(new: Double?, old: Double?, currency: String?): String {
             if (new == null || old == null || currency == null) return ""
+            if (new == 0.0) return "+${addCurrency(new, currency, false)} (0.0%)"
             var result = ""
             result += if (new - old < 0) "-" else "+"
             result += addCurrency(new - old, currency, false)
