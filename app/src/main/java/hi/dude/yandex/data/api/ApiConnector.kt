@@ -60,7 +60,7 @@ class ApiConnector {
             SUMMARY("/profile/"),                           // need tickerKey
             TOP_STOCKS("/stock-screener?exchange=nasdaq&"),
             CHART_DAY("/historical-chart/5min/"),           // need tickerKey
-            CHART_WEEK("/historical-chart/30min/"),         // need tickerKey
+            CHART_WEEK("/historical-chart/15min/"),         // need tickerKey
             CHART_MONTH("/historical-chart/1hour/"),        // need tickerKey
             CHART_SIX_MONTH("/historical-chart/4hour/"),    // need tickerKey
             CHART_YEAR("/historical-price-full/"),          // need tickerKey
