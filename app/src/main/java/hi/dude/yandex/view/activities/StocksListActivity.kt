@@ -3,11 +3,11 @@ package hi.dude.yandex.view.activities
 import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import hi.dude.yandex.R
-import hi.dude.yandex.application.App
 import hi.dude.yandex.view.adapters.StocksPagerAdapter
 import hi.dude.yandex.view.pages.Page
 import hi.dude.yandex.viewmodel.StockViewModel
@@ -53,7 +53,7 @@ class StocksListActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 changeMenuButtonStyle(viewPager2.currentItem != 0)
                 if (viewPager2.currentItem == 0) {
-                    viewModel.pullStocks()
+                    viewModel.pullAllStocks()
                     viewModel.updateStar(stocksPage.recAdapter)
                 } else {
                     viewModel.pullFavors()
@@ -68,8 +68,18 @@ class StocksListActivity : AppCompatActivity() {
     }
 
     private fun subscribe() {
-        viewModel.stocks.observe(this) { stocksPage.recAdapter.stocks = it }
-        viewModel.favors.observe(this) { favorsPage.recAdapter.stocks = it }
+        viewModel.stocks.observe(this) {
+            Log.i("ListActivity", "subscribe: stocks")
+            stocksPage.stocks = it
+        }
+        viewModel.favors.observe(this) {
+            Log.i("ListActivity", "subscribe: favors")
+            favorsPage.stocks = it
+        }
+        viewModel.allStocks.observe(this) {
+            Log.i("ListActivity", "subscribe: allStocks")
+            viewModel.addStocks(stocksPage.recAdapter)
+        }
     }
 
     private fun changeMenuButtonStyle(isFavor: Boolean) {

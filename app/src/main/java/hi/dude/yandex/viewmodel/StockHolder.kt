@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.squareup.picasso.Picasso
 import hi.dude.yandex.R
+import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +25,7 @@ class StockHolder(
     val company = companyOrNull ?: ""
     var price = priceOrNull ?: ""
 
-    private val imageUrl = "https://financialmodelingprep.com/image-stock/$ticker"
+    private val imageUrl = "https://financialmodelingprep.com/image-stock/$ticker.jpg"
 
     constructor(stock: Stock) : this(
         stock.ticker,
@@ -39,7 +40,6 @@ class StockHolder(
             try {
                 Picasso.get()
                     .load(imageUrl)
-                    .centerCrop()
                     .error(R.drawable.empty)
                     .placeholder(R.drawable.empty)
                     .get()
@@ -53,15 +53,16 @@ class StockHolder(
     private suspend fun pullChangeAndPrice(logMessage: Any? = null) {
         val result = CoroutineScope(Dispatchers.IO).async {
             try {
-
+                Repository.getInstance().getQuote(ticker)
             } catch (e: IOException) {
                 Log.e("StockHolder", "pullChange: $logMessage", e)
+                null
             }
         }
-        val quote = result.await() as Quote
+        val quote = result.await() as Quote?
 
-        change = DataFormatter.getChange(quote.open, quote.close, currency)
-        price = DataFormatter.addCurrency(quote.open, currency, true)
+        change = DataFormatter.getChange(quote?.open, quote?.close, currency)
+        price = DataFormatter.addCurrency(quote?.open, currency, true)
     }
 
     suspend fun pullData(logMessage: Any? = null) {

@@ -3,6 +3,7 @@ package hi.dude.yandex.model.api
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -108,4 +109,13 @@ class ApiConnector {
         return gson.fromJson(json, type) ?: ArrayList()
     }
 
+    suspend fun getQuote(ticker: String?): Quote? {
+        val type = object : TypeToken<ArrayList<Quote?>?>() {}.type
+        val json = getJson(REQUEST.QUOTE, ticker)
+        return try {
+            (gson.fromJson(json, type) as ArrayList<Quote>)[0]
+        } catch (e: IndexOutOfBoundsException) {
+            null
+        }
+    }
 }

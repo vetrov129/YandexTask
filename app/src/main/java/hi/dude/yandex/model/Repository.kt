@@ -1,11 +1,11 @@
 package hi.dude.yandex.model
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import hi.dude.yandex.model.api.ApiConnector
+import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import hi.dude.yandex.model.room.DaoGetter
 import hi.dude.yandex.model.room.QueryDao
@@ -13,21 +13,29 @@ import hi.dude.yandex.model.room.StockDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class Repository(val app: Application) {
+class Repository private constructor() {
 
-    private val TAG = "Repository"
+    companion object {
+        private var repository: Repository? = null
+
+        fun getInstance(): Repository {
+            if (repository == null)
+                repository = Repository()
+            return repository!!
+        }
+    }
 
     private val connector = ApiConnector()
     private lateinit var favorDao: StockDao
     private lateinit var queryDao: QueryDao
 
-    lateinit var allStocks: ArrayList<Stock>
+    val allStocks: MutableLiveData<ArrayList<Stock>> = MutableLiveData()
 
 //    val stocks = MutableLiveData<ArrayList<Stock>>()
-    lateinit var favors: LiveData<List<Stock>>
+    var favors: LiveData<List<Stock>> = MutableLiveData()
         private set
 
-    suspend fun initDao() = withContext(Dispatchers.IO) {
+    suspend fun initDao(app: Application) = withContext(Dispatchers.IO) {
         val daoGetter = Room.databaseBuilder(app.applicationContext, DaoGetter::class.java, "stocks.sqlite")
             .fallbackToDestructiveMigration()  // TODO: 18.03.2021 remove it!!!
             .build()
@@ -36,17 +44,19 @@ class Repository(val app: Application) {
         queryDao = daoGetter.getQueryDao()
     }
 
-    suspend fun pullStocks() {
+    suspend fun pullAllStocks() {
         try {
-            allStocks = connector.getAllStocks()
+            allStocks.value = connector.getAllStocks()
         } catch (e: Throwable) {
             e.printStackTrace()
         }
     }
 
-    suspend fun pullFavors() {
+    suspend fun pullFavors() = withContext(Dispatchers.IO){
         favors = favorDao.getAll()
     }
 
-
+    suspend fun getQuote(ticker: String): Quote? {
+        return connector.getQuote(ticker)
+    }
 }
