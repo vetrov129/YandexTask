@@ -70,7 +70,7 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         return favors.value?.any { it.ticker == ticker } ?: false
     }
 
-    fun addStocks(adapter: RecyclerView.Adapter<*>, start: Int = 0, until: Int = 30) {
+    fun addStocks(adapter: RecyclerView.Adapter<*>, start: Int = 0, until: Int = 20) {
         try {
             val newList = ArrayList<StockHolder>()
             if (mutableStocks.value != null)

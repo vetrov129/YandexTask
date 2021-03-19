@@ -96,8 +96,14 @@ class ApiConnector {
                     Log.e(TAG, "getJson:", e)
                     null
                 } catch (e: FileNotFoundException) {
-                    Log.e(TAG, "getJson:", e)
-                    null
+                    delay(1000)  // code 429 Too Many Requests
+                    try {
+                        URL(url).readText()
+                    } catch (e: FileNotFoundException) {
+                        Log.e(TAG, "getJson:", e)
+                        null
+                    }
+
                 }
             }
 
