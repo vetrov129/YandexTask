@@ -28,9 +28,10 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
 
     init {
         launch(handlerLong) {
-            repository.initDao(app)
+            repository.init(app)
             repository.pullAllStocks()
             repository.pullFavors()
+            repository.pullSearchedQueries()
         }
     }
 
@@ -40,7 +41,7 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
     val stocks: LiveData<ArrayList<StockHolder>> = mutableStocks
     val allStocks: LiveData<ArrayList<Stock>> = repository.allStocks
     // TODO: 18.03.2021 мб подтягивать в геттерах?
-
+    val searchedQueries: LiveData<List<String>> = repository.searchedQueries
 
     fun pullFavors() = launch(handlerLong) {
         repository.pullFavors()
@@ -62,7 +63,7 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
                     adapter.notifyItemChanged(i)
                 } catch (e: NullPointerException) {
                     Log.e("ViewModel", "updateStar: NPE inside, continue cycle")
-                }
+                } // TODO: 19.03.2021 убрать isFavor, хранинить избранные в сете, чекать в адаптере
             }
         } catch (e: NullPointerException) {
             Log.e("ViewModel", "updateStar: NPE outside, break cycle")
@@ -132,5 +133,28 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         val holders = ArrayList<StockHolder>()
         favors.value?.forEach { holders.add(StockHolder(it)) }
         return holders
+    }
+
+    fun getPopularCompany(count: Int = 20): ArrayList<String> {
+        val companies = ArrayList<String>()
+        for (i in 0 until count) {
+            try {
+                companies.add(DataFormatter.companyToQuery(stocks.value!![i].company))
+            } catch (e: IndexOutOfBoundsException) {
+                // empty
+            }
+        }
+        return companies
+    }
+
+    fun pullSearchedQueries(count: Int = 30) = launch(handlerLong) {
+        repository.pullSearchedQueries(count)
+    }
+
+    fun saveQuery(query: String) = launch(handlerLong) {
+        if (query != "") {
+            repository.saveQuery(query)
+            repository.pullSearchedQueries()
+        } // TODO: 20.03.2021 возможно нужно ждать окончания первого метода
     }
 }

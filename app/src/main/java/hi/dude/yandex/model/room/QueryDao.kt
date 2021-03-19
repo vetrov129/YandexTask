@@ -11,7 +11,7 @@ import hi.dude.yandex.model.entities.UserQuery
 interface QueryDao {
 
     @Query("SELECT text FROM user_query ORDER BY date DESC LIMIT :count;")
-    fun getStrings(count: Int): LiveData<List<String>>
+    fun getStrings(count: Int): List<String>
 
     @Insert
     fun save(query: UserQuery)
