@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.net.URL
@@ -86,12 +87,16 @@ class ApiConnector {
             }
             url += API_KEY
             Log.i(TAG, "getJson: $url")
-            var json: String?
+            var json: String? = null
 
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 json = try {
                     URL(url).readText()
                 } catch (e: UnknownHostException) {
+                    Log.e(TAG, "getJson:", e)
+                    null
+                } catch (e: FileNotFoundException) {
+                    Log.e(TAG, "getJson:", e)
                     null
                 }
             }

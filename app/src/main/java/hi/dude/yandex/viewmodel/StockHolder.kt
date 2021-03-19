@@ -7,9 +7,7 @@ import hi.dude.yandex.R
 import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import java.io.IOException
 
 class StockHolder(
@@ -25,7 +23,7 @@ class StockHolder(
     val company = companyOrNull ?: ""
     var price = priceOrNull ?: ""
 
-    private val imageUrl = "https://financialmodelingprep.com/image-stock/$ticker.jpg"
+    private val imageUrl = "https://financialmodelingprep.com/image-stock/$ticker"
 
     constructor(stock: Stock) : this(
         stock.ticker,
@@ -35,22 +33,30 @@ class StockHolder(
         stock.country
     )
 
-    private suspend fun pullImage(logMessage: Any? = null) {
+    suspend fun pullImage(logMessage: Any? = null) {
         val result = CoroutineScope(Dispatchers.IO).async {
             try {
                 Picasso.get()
-                    .load(imageUrl)
+                    .load("$imageUrl.jpg")
                     .error(R.drawable.empty)
                     .placeholder(R.drawable.empty)
                     .get()
             } catch (e: IOException) {
-                Log.e("StockHolder", "pullImage: $logMessage", e)
+                try {
+                    Picasso.get()
+                        .load("$imageUrl.png")
+                        .error(R.drawable.empty)
+                        .placeholder(R.drawable.empty)
+                        .get()
+                } catch (e: IOException) {
+                    Log.e("StockHolder", "pullImage: $logMessage", e)
+                }
             }
         }
         image = result.await() as Bitmap
     }
 
-    private suspend fun pullChangeAndPrice(logMessage: Any? = null) {
+    suspend fun pullChangeAndPrice(logMessage: Any? = null) {
         val result = CoroutineScope(Dispatchers.IO).async {
             try {
                 Repository.getInstance().getQuote(ticker)
@@ -62,7 +68,8 @@ class StockHolder(
         val quote = result.await() as Quote?
 
         change = DataFormatter.getChange(quote?.open, quote?.close, currency)
-        price = DataFormatter.addCurrency(quote?.open, currency, true)
+        if (quote != null)
+         price = DataFormatter.addCurrency(quote.open, currency, true)
     }
 
     suspend fun pullData(logMessage: Any? = null) {

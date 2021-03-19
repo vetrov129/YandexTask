@@ -53,7 +53,7 @@ class StocksListActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 changeMenuButtonStyle(viewPager2.currentItem != 0)
                 if (viewPager2.currentItem == 0) {
-                    viewModel.pullAllStocks()
+//                    viewModel.pullAllStocks()
                     viewModel.updateStar(stocksPage.recAdapter)
                 } else {
                     viewModel.pullFavors()

@@ -37,7 +37,7 @@ class Repository private constructor() {
 
     suspend fun initDao(app: Application) = withContext(Dispatchers.IO) {
         val daoGetter = Room.databaseBuilder(app.applicationContext, DaoGetter::class.java, "stocks.sqlite")
-            .fallbackToDestructiveMigration()  // TODO: 18.03.2021 remove it!!!
+//            .fallbackToDestructiveMigration()
             .build()
 
         favorDao = daoGetter.getStockDao()

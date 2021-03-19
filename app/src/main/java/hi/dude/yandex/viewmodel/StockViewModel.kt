@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import hi.dude.yandex.model.Repository
-import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import kotlinx.coroutines.*
 
@@ -46,11 +45,11 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         mutableFavors.value = DataFormatter.stocksToHolders(repository.favors).value
     }
 
-    fun pullAllStocks() = launch {
-        if (stocks.value?.size == 0 || stocks.value == null) {
-            repository.pullAllStocks()
-        }
-    }
+//    fun pullAllStocks() = launch {
+//        if (stocks.value?.size == 0 || stocks.value == null) {
+//            repository.pullAllStocks()
+//        }
+//    }
 
     fun updateStar(adapter: RecyclerView.Adapter<*>) = launch {
         try {
@@ -81,7 +80,6 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
             }
             mutableStocks.value = newList
             adapter.notifyDataSetChanged()
-            Log.i("ViewModel", "addStocks: stocks added")
         } catch (e: IndexOutOfBoundsException) {
             Log.e("ViewModel", "addStocks: end of list, added ${stocks.value?.size}")
         } catch (e: NullPointerException) {
@@ -91,18 +89,26 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
 
     fun pullHolderData(start: Int, end: Int, adapter: RecyclerView.Adapter<*>, list: List<StockHolder>) {
         for (position in start until end) {
-            launch(handlerLong) {
+            val image = launch(handlerLong) {
                 try {
-                    list[position].pullData(list[position].ticker)
-                    adapter.notifyItemChanged(position)
+                    list[position].pullImage(list[position].ticker)
                 } catch (e: IndexOutOfBoundsException) {
-                    Log.e("ViewModel", "pullData: end of list")
+                    Log.e("ViewModel", "pullHolderData: end of list")
                 }
             }
+            val price = launch(handlerLong) {
+                image.join()
+                adapter.notifyItemChanged(position)
+                try {
+                    list[position].pullChangeAndPrice(list[position].ticker)
+                } catch (e: IndexOutOfBoundsException) {
+                    Log.e("ViewModel", "pullHolderData: end of list")
+                }
+            }
+            launch(handlerLong) {
+                price.join()
+                adapter.notifyItemChanged(position)
+            }
         }
-    }
-
-    suspend fun getQuote(ticker: String): Quote? {
-        return repository.getQuote(ticker)
     }
 }
