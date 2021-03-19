@@ -1,13 +1,20 @@
 package hi.dude.yandex.viewmodel
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import com.squareup.picasso.Picasso
 import hi.dude.yandex.R
 import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
+import hi.dude.yandex.model.room.FavorStock
 import kotlinx.coroutines.*
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 class StockHolder(
@@ -23,8 +30,6 @@ class StockHolder(
     val company = companyOrNull ?: ""
     var price = priceOrNull ?: ""
 
-    private val imageUrl = "https://financialmodelingprep.com/image-stock/$ticker"
-
     constructor(stock: Stock) : this(
         stock.ticker,
         DataFormatter.cutCompany(stock.company),
@@ -33,7 +38,19 @@ class StockHolder(
         stock.country
     )
 
+    constructor(favor: FavorStock): this(favor.ticker, favor.company, favor.price, true, favor.currency)
+
+    fun toFavor(): FavorStock {
+        val bos = ByteArrayOutputStream()
+        image.compress(Bitmap.CompressFormat.PNG, 100, bos)
+        val array = bos.toByteArray()
+        return FavorStock(ticker, company, price, change, array, currency)
+    }
+
+//    fun toStock() = Stock(ticker, company, null, currency)
+
     suspend fun pullImage(logMessage: Any? = null) {
+        val imageUrl = "https://financialmodelingprep.com/image-stock/$ticker"
         val result = CoroutineScope(Dispatchers.IO).async {
             try {
                 Picasso.get()
@@ -70,10 +87,5 @@ class StockHolder(
         change = DataFormatter.getChange(quote?.open, quote?.close, currency)
         if (quote != null)
          price = DataFormatter.addCurrency(quote.open, currency, true)
-    }
-
-    suspend fun pullData(logMessage: Any? = null) {
-        pullImage(logMessage)
-        pullChangeAndPrice(logMessage)
     }
 }

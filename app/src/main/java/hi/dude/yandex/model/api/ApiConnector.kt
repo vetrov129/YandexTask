@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.net.URL
 import java.net.UnknownHostException
-
+// this class (and not Retrofit for example) is used to bypass the limit on the number of requests per day
 class ApiConnector {
     private companion object {
         const val TAG = "ApiConnector"

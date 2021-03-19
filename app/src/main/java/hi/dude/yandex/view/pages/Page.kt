@@ -9,7 +9,7 @@ import hi.dude.yandex.viewmodel.StockHolder
 import hi.dude.yandex.viewmodel.StockViewModel
 
 class Page(
-    stocks: ArrayList<StockHolder>,
+    stocks: List<StockHolder>,
     val searchPanel: View?,
     resources: Resources,
     context: Context,

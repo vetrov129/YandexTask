@@ -4,8 +4,10 @@ import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import hi.dude.yandex.R
 import hi.dude.yandex.view.adapters.StocksPagerAdapter
@@ -29,19 +31,40 @@ class StocksListActivity : AppCompatActivity() {
         supportActionBar?.hide()
         viewModel = StockViewModel(application)
 
+        hideUnnecessary()
         setUpPager()
     }
 
+    private fun hideUnnecessary() {
+        resultContainer.visibility = View.GONE
+        hintsContainer.visibility = View.GONE
+        ibBackSearch.visibility = View.GONE
+        ibClearSearch.visibility = View.GONE
+    }
+
+    private val starClickedOnStocks: (Int) -> Unit = {
+        if (stocksPage.stocks[it].isFavor)
+            viewModel.deleteFavor(stocksPage.stocks[it])
+        else
+            viewModel.saveFavor(stocksPage.stocks[it])
+        stocksPage.stocks[it].isFavor = !stocksPage.stocks[it].isFavor
+        stocksPage.recAdapter.notifyItemChanged(it)
+    }
+
+    private val starClickedOnFavors:(Int) -> Unit = {
+        viewModel.deleteFavor(favorsPage.stocks[it])
+        favorsPage.recAdapter.notifyItemRemoved(it)
+    }
+
     private fun setUpPager() {
-        val starClicked: (Int) -> Unit = {}
 
         stocksPage = Page(
             viewModel.stocks.value ?: ArrayList(),
-            searchContainer, resources, this, viewModel, starClicked
+            searchContainer, resources, this, viewModel, starClickedOnStocks
         )
         favorsPage = Page(
-            viewModel.favors.value ?: ArrayList(),
-            searchContainer, resources, this, viewModel, starClicked
+            viewModel.getFavorHolders(),
+            searchContainer, resources, this, viewModel, starClickedOnFavors
         )
 
         vpAdapter = StocksPagerAdapter(arrayListOf(stocksPage, favorsPage))
@@ -53,10 +76,9 @@ class StocksListActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 changeMenuButtonStyle(viewPager2.currentItem != 0)
                 if (viewPager2.currentItem == 0) {
-//                    viewModel.pullAllStocks()
                     viewModel.updateStar(stocksPage.recAdapter)
                 } else {
-                    viewModel.pullFavors()
+                    favorsPage.stocks = viewModel.getFavorHolders()
                 }
             }
         })
@@ -74,11 +96,12 @@ class StocksListActivity : AppCompatActivity() {
         }
         viewModel.favors.observe(this) {
             Log.i("ListActivity", "subscribe: favors")
-            favorsPage.stocks = it
+            favorsPage.stocks = viewModel.getFavorHolders()
         }
         viewModel.allStocks.observe(this) {
             Log.i("ListActivity", "subscribe: allStocks")
             viewModel.addStocks(stocksPage.recAdapter)
+            viewModel.pullFavors(stocksPage.recAdapter)
         }
     }
 

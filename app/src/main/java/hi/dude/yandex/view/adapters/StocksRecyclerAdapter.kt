@@ -1,9 +1,7 @@
 package hi.dude.yandex.view.adapters
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,14 +12,14 @@ import hi.dude.yandex.viewmodel.StockViewModel
 import kotlinx.android.synthetic.main.list_item_stock.view.*
 
 class StocksRecyclerAdapter(
-    stocks: ArrayList<StockHolder>,
+    stocks: List<StockHolder>,
     private val resources: Resources,
     private val context: Context,
     private val viewModel: StockViewModel,
     private val starClicked: (Int) -> Unit
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var stocks: ArrayList<StockHolder> = stocks
+    var stocks: List<StockHolder> = stocks
         set(value) {
             field = value
             notifyDataSetChanged()

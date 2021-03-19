@@ -8,8 +8,10 @@ import hi.dude.yandex.model.api.ApiConnector
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import hi.dude.yandex.model.room.DaoGetter
+import hi.dude.yandex.model.room.FavorStock
 import hi.dude.yandex.model.room.QueryDao
 import hi.dude.yandex.model.room.StockDao
+import hi.dude.yandex.viewmodel.StockHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -30,14 +32,12 @@ class Repository private constructor() {
     private lateinit var queryDao: QueryDao
 
     val allStocks: MutableLiveData<ArrayList<Stock>> = MutableLiveData()
-
-//    val stocks = MutableLiveData<ArrayList<Stock>>()
-    var favors: LiveData<List<Stock>> = MutableLiveData()
+    var favors: MutableLiveData<List<FavorStock>> = MutableLiveData()
         private set
 
     suspend fun initDao(app: Application) = withContext(Dispatchers.IO) {
         val daoGetter = Room.databaseBuilder(app.applicationContext, DaoGetter::class.java, "stocks.sqlite")
-//            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration()
             .build()
 
         favorDao = daoGetter.getStockDao()
@@ -53,10 +53,20 @@ class Repository private constructor() {
     }
 
     suspend fun pullFavors() = withContext(Dispatchers.IO){
-        favors = favorDao.getAll()
+        val list = favorDao.getAll()
+        withContext(Dispatchers.Main) { favors.value = list }
     }
 
     suspend fun getQuote(ticker: String): Quote? {
         return connector.getQuote(ticker)
     }
+
+    suspend fun deleteFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
+        favorDao.delete(favor)
+    }
+
+    suspend fun saveFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
+        favorDao.save(favor)
+    }
 }
+

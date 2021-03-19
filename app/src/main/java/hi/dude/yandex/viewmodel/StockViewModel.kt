@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Stock
+import hi.dude.yandex.model.room.FavorStock
 import kotlinx.coroutines.*
 
 class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
@@ -26,32 +27,34 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
     private val repository = Repository.getInstance()
 
     init {
-        launch {
+        launch(handlerLong) {
             repository.initDao(app)
             repository.pullAllStocks()
+            repository.pullFavors()
         }
     }
 
     private val mutableStocks = MutableLiveData<ArrayList<StockHolder>>()
-    private val mutableFavors = DataFormatter.stocksToHolders(repository.favors)
 
-    val favors: LiveData<ArrayList<StockHolder>> = mutableFavors
-    val stocks: LiveData<ArrayList<StockHolder>> = mutableStocks  // TODO: 18.03.2021 мб подтягивать в геттерах?
+    val favors: LiveData<List<FavorStock>> = repository.favors
+    val stocks: LiveData<ArrayList<StockHolder>> = mutableStocks
     val allStocks: LiveData<ArrayList<Stock>> = repository.allStocks
+    // TODO: 18.03.2021 мб подтягивать в геттерах?
 
 
-    fun pullFavors() = launch {
+    fun pullFavors() = launch(handlerLong) {
         repository.pullFavors()
-        mutableFavors.value = DataFormatter.stocksToHolders(repository.favors).value
     }
 
-//    fun pullAllStocks() = launch {
-//        if (stocks.value?.size == 0 || stocks.value == null) {
-//            repository.pullAllStocks()
-//        }
-//    }
+    fun pullFavors(adapter: RecyclerView.Adapter<*>) {
+        val favorJob = launch { repository.pullFavors() }
+        launch {
+            favorJob.join()
+            updateStar(adapter)
+        }
+    }
 
-    fun updateStar(adapter: RecyclerView.Adapter<*>) = launch {
+    fun updateStar(adapter: RecyclerView.Adapter<*>) = launch(handlerLong) {
         try {
             for (i in stocks.value!!.indices) {
                 try {
@@ -110,5 +113,24 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
                 adapter.notifyItemChanged(position)
             }
         }
+    }
+
+    fun deleteFavor(favor: StockHolder) = launch(handlerLong) {
+        repository.deleteFavor(favor.toFavor())
+        pullFavors()
+        Log.i("ViewModel", "deleteFavor: deleted")
+    }
+
+    fun saveFavor(favor: StockHolder) = launch(handlerLong) {
+        repository.saveFavor(favor.toFavor())
+        pullFavors()
+        Log.i("ViewModel", "deleteFavor: saved")
+    }
+
+    fun getFavorHolders(): ArrayList<StockHolder> {
+        Log.i("ViewModel", "getFavorHolders: favors.size ${favors.value?.size}")
+        val holders = ArrayList<StockHolder>()
+        favors.value?.forEach { holders.add(StockHolder(it)) }
+        return holders
     }
 }
