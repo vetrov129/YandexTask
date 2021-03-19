@@ -1,4 +1,4 @@
-package hi.dude.yandex.model.room
+package hi.dude.yandex.model.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

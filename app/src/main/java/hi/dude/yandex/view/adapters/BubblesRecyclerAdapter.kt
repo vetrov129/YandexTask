@@ -1,18 +1,14 @@
 package hi.dude.yandex.view.adapters
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import hi.dude.yandex.application.App
 import hi.dude.yandex.R
-import kotlinx.android.synthetic.main.activity_stocks_list.*
-import kotlinx.android.synthetic.main.activity_stocks_list.view.*
 import kotlinx.android.synthetic.main.list_item_bubble.view.*
 
-class RecyclerBubblesAdapter(bubbles: List<String>, val bubbleClicked: (String) -> Unit) :
-    RecyclerView.Adapter<RecyclerBubblesAdapter.ViewHolder>() {
+class BubblesRecyclerAdapter(bubbles: List<String>, val bubbleClicked: (String) -> Unit) :
+    RecyclerView.Adapter<BubblesRecyclerAdapter.ViewHolder>() {
 
     var bubbles: List<String> = bubbles
         set(value) {

@@ -3,6 +3,7 @@ package hi.dude.yandex.model.api
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import hi.dude.yandex.model.entities.QueryResult
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import kotlinx.coroutines.Dispatchers
@@ -127,6 +128,16 @@ class ApiConnector {
             (gson.fromJson(json, type) as ArrayList<Quote>)[0]
         } catch (e: IndexOutOfBoundsException) {
             null
+        }
+    }
+
+    suspend fun getQueryResult(query: String, limit: Int): ArrayList<QueryResult> {
+        val type = object : TypeToken<ArrayList<QueryResult?>?>() {}.type
+        return try {
+            val json = getJson(REQUEST.SEARCH, null, Pair("query", query), Pair("limit", "$limit"))
+            gson.fromJson(json, type) ?: ArrayList()
+        } catch (e: FileNotFoundException) {
+            ArrayList()
         }
     }
 }

@@ -8,7 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Stock
-import hi.dude.yandex.model.room.FavorStock
+import hi.dude.yandex.model.entities.FavorStock
+import hi.dude.yandex.model.entities.QueryResult
 import kotlinx.coroutines.*
 
 class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
@@ -36,42 +37,26 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
     }
 
     private val mutableStocks = MutableLiveData<ArrayList<StockHolder>>()
+    private val favorTickerSet = HashSet<String>()
 
     val favors: LiveData<List<FavorStock>> = repository.favors
     val stocks: LiveData<ArrayList<StockHolder>> = mutableStocks
     val allStocks: LiveData<ArrayList<Stock>> = repository.allStocks
+
     // TODO: 18.03.2021 мб подтягивать в геттерах?
     val searchedQueries: LiveData<List<String>> = repository.searchedQueries
+    val queryResult: LiveData<ArrayList<QueryResult>> = repository.queryResult
 
-    fun pullFavors() = launch(handlerLong) {
-        repository.pullFavors()
-    }
-
-    fun pullFavors(adapter: RecyclerView.Adapter<*>) {
-        val favorJob = launch { repository.pullFavors() }
-        launch {
+    fun pullFavors() {
+        val favorJob = launch(handlerLong) { repository.pullFavors() }
+        launch(handlerLong) {
             favorJob.join()
-            updateStar(adapter)
+            favors.value?.forEach { favorTickerSet.add(it.ticker) }
         }
     }
 
-    fun updateStar(adapter: RecyclerView.Adapter<*>) = launch(handlerLong) {
-        try {
-            for (i in stocks.value!!.indices) {
-                try {
-                    stocks.value!![i].isFavor = checkIsFavor(stocks.value!![i].ticker)
-                    adapter.notifyItemChanged(i)
-                } catch (e: NullPointerException) {
-                    Log.e("ViewModel", "updateStar: NPE inside, continue cycle")
-                } // TODO: 19.03.2021 убрать isFavor, хранинить избранные в сете, чекать в адаптере
-            }
-        } catch (e: NullPointerException) {
-            Log.e("ViewModel", "updateStar: NPE outside, break cycle")
-        }
-    }
-
-    private fun checkIsFavor(ticker: String): Boolean {
-        return favors.value?.any { it.ticker == ticker } ?: false
+    fun checkIsFavor(ticker: String): Boolean {
+        return favorTickerSet.contains(ticker)
     }
 
     fun addStocks(adapter: RecyclerView.Adapter<*>, start: Int = 0, until: Int = 20) {
@@ -117,19 +102,34 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
     }
 
     fun deleteFavor(favor: StockHolder) = launch(handlerLong) {
+        favorTickerSet.remove(favor.ticker)
         repository.deleteFavor(favor.toFavor())
         pullFavors()
-        Log.i("ViewModel", "deleteFavor: deleted")
+    }
+
+    fun deleteFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
+        val favorJob = deleteFavor(favor)
+        launch(handlerLong) {
+            favorJob.join()
+            adapter.notifyItemChanged(position)
+        }
     }
 
     fun saveFavor(favor: StockHolder) = launch(handlerLong) {
+        favorTickerSet.add(favor.ticker)
         repository.saveFavor(favor.toFavor())
         pullFavors()
-        Log.i("ViewModel", "deleteFavor: saved")
+    }
+
+    fun saveFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
+        val favorJob = saveFavor(favor)
+        launch(handlerLong) {
+            favorJob.join()
+            adapter.notifyItemChanged(position)
+        }
     }
 
     fun getFavorHolders(): ArrayList<StockHolder> {
-        Log.i("ViewModel", "getFavorHolders: favors.size ${favors.value?.size}")
         val holders = ArrayList<StockHolder>()
         favors.value?.forEach { holders.add(StockHolder(it)) }
         return holders
@@ -156,5 +156,9 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
             repository.saveQuery(query)
             repository.pullSearchedQueries()
         } // TODO: 20.03.2021 возможно нужно ждать окончания первого метода
+    }
+
+    fun runSearch(query: String, limit: Int = 4) = launch {
+        repository.pullQueryResult(query, limit)
     }
 }

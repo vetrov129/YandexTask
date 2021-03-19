@@ -3,18 +3,13 @@ package hi.dude.yandex.model
 import android.app.Application
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import hi.dude.yandex.model.api.ApiConnector
-import hi.dude.yandex.model.entities.Quote
-import hi.dude.yandex.model.entities.Stock
-import hi.dude.yandex.model.entities.UserQuery
+import hi.dude.yandex.model.entities.*
 import hi.dude.yandex.model.room.DaoGetter
-import hi.dude.yandex.model.room.FavorStock
 import hi.dude.yandex.model.room.QueryDao
 import hi.dude.yandex.model.room.StockDao
-import hi.dude.yandex.viewmodel.StockHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -39,6 +34,7 @@ class Repository private constructor() {
         private set
 
     val searchedQueries: MutableLiveData<List<String>> = MutableLiveData()
+    val queryResult: MutableLiveData<ArrayList<QueryResult>> = MutableLiveData()
 
     suspend fun init(app: Application) = withContext(Dispatchers.IO) {
         val daoGetter = Room.databaseBuilder(app.applicationContext, DaoGetter::class.java, "stocks.sqlite")
@@ -85,6 +81,11 @@ class Repository private constructor() {
         } catch (e: SQLiteConstraintException) {
             Log.i("Repository", "saveQuery: not unique value $query")
         }
+    }
+
+    suspend fun pullQueryResult(query: String, limit: Int) = withContext(Dispatchers.IO){
+        val list = connector.getQueryResult(query, limit)
+        withContext(Dispatchers.Main) { queryResult.value = list }
     }
 }
 

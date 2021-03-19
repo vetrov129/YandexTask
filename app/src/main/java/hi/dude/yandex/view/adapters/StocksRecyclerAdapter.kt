@@ -49,7 +49,7 @@ class StocksRecyclerAdapter(
         else
             view.tvDiffStock.setTextColor(resources.getColor(R.color.colorGreen))
 
-        if (stock.isFavor) view.ivStarStock.setImageResource(R.drawable.ic_yellow_star)
+        if (viewModel.checkIsFavor(stock.ticker)) view.ivStarStock.setImageResource(R.drawable.ic_yellow_star)
         else view.ivStarStock.setImageResource(R.drawable.ic_gray_star)
 
         if (position % 2 == 0) view.containerStock.setBackgroundResource(R.color.colorBG)
@@ -58,17 +58,6 @@ class StocksRecyclerAdapter(
         view.ivStarStock.setOnClickListener { starClicked(position) }
         view.setOnClickListener { itemClicked(position) }
     }
-
-//    fun pullData(start: Int = 0) { // update price, change and image
-//        for (i in start until stocks.size) {
-//            try {
-//                stocks[i].pullData()
-//                activity.runOnUiThread { notifyItemChanged(i) }
-//            } catch (e: Exception) {
-//                Log.e("RecyclerAdapter", "pullData: ", e)
-//            }
-//        }
-//    }
 
     private fun itemClicked(position: Int) {
 //        val intent = Intent(activity, StockCardActivity::class.java)
@@ -81,10 +70,6 @@ class StocksRecyclerAdapter(
 //        intent.putExtra("image", stocks[position].image)
 //        activity.startActivity(intent)
     }
-
-//    abstract fun starClicked(position: Int)
-//
-//    abstract fun updateData() // find changes made in other components
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

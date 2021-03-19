@@ -1,18 +1,13 @@
 package hi.dude.yandex.viewmodel
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import com.squareup.picasso.Picasso
 import hi.dude.yandex.R
 import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
-import hi.dude.yandex.model.room.FavorStock
+import hi.dude.yandex.model.entities.FavorStock
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -21,7 +16,6 @@ class StockHolder(
     val ticker: String,
     companyOrNull: String?,
     priceOrNull: String?,
-    var isFavor: Boolean,
     currencyOrNull: String?
 ) {
     var image: Bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
@@ -34,11 +28,10 @@ class StockHolder(
         stock.ticker,
         DataFormatter.cutCompany(stock.company),
         DataFormatter.addCurrency(stock.price, stock.country, true),
-        false,
         stock.country
     )
 
-    constructor(favor: FavorStock): this(favor.ticker, favor.company, favor.price, true, favor.currency)
+    constructor(favor: FavorStock): this(favor.ticker, favor.company, favor.price, favor.currency)
 
     fun toFavor(): FavorStock {
         val bos = ByteArrayOutputStream()

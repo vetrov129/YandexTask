@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import hi.dude.yandex.R
-import hi.dude.yandex.view.adapters.RecyclerBubblesAdapter
+import hi.dude.yandex.view.adapters.BubblesRecyclerAdapter
 import hi.dude.yandex.view.adapters.StocksPagerAdapter
 import hi.dude.yandex.view.pages.Page
 import hi.dude.yandex.viewmodel.StockViewModel
@@ -77,8 +77,8 @@ class StocksListActivity : AppCompatActivity() {
     private fun setUpHints() {
         val bubbleClicked: (String) -> Unit = { edSearch.setText(it) }
 
-        val popularAdapter = RecyclerBubblesAdapter(ArrayList(), bubbleClicked)
-        val queryAdapter = RecyclerBubblesAdapter(viewModel.searchedQueries.value ?: ArrayList(), bubbleClicked)
+        val popularAdapter = BubblesRecyclerAdapter(ArrayList(), bubbleClicked)
+        val queryAdapter = BubblesRecyclerAdapter(viewModel.searchedQueries.value ?: ArrayList(), bubbleClicked)
         rvSearchedBubbles.adapter = queryAdapter
         rvPopularBubbles.adapter = popularAdapter
 
@@ -90,16 +90,13 @@ class StocksListActivity : AppCompatActivity() {
 
     private fun setUpPages() {
         val starClickedOnStocks: (Int) -> Unit = {
-            if (stocksPage.stocks[it].isFavor)
-                viewModel.deleteFavor(stocksPage.stocks[it])
+            if (viewModel.checkIsFavor(stocksPage.stocks[it].ticker))
+                viewModel.deleteFavor(stocksPage.stocks[it], stocksPage.recAdapter, it)
             else
-                viewModel.saveFavor(stocksPage.stocks[it])
-            stocksPage.stocks[it].isFavor = !stocksPage.stocks[it].isFavor
-            stocksPage.recAdapter.notifyItemChanged(it)
+                viewModel.saveFavor(stocksPage.stocks[it], stocksPage.recAdapter, it)
         }
         val starClickedOnFavors: (Int) -> Unit = {
-            viewModel.deleteFavor(favorsPage.stocks[it])
-            favorsPage.recAdapter.notifyItemRemoved(it)
+            viewModel.deleteFavor(favorsPage.stocks[it], favorsPage.recAdapter, it)
         }
 
         stocksPage = Page(
@@ -123,7 +120,7 @@ class StocksListActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 changeMenuButtonStyle(viewPager2.currentItem != 0)
                 if (viewPager2.currentItem == 0) {
-                    viewModel.updateStar(stocksPage.recAdapter)
+                    stocksPage.recAdapter.notifyDataSetChanged()
                 } else {
                     favorsPage.stocks = viewModel.getFavorHolders()
                 }
@@ -147,9 +144,10 @@ class StocksListActivity : AppCompatActivity() {
         }
         viewModel.allStocks.observe(this) {
             Log.i("ListActivity", "subscribe: allStocks")
+            viewModel.pullFavors() // TODO: 20.03.2021 надо постараться вызывать этот метод раньше
             viewModel.addStocks(stocksPage.recAdapter)
-            viewModel.pullFavors(stocksPage.recAdapter)
-            (rvPopularBubbles.adapter as RecyclerBubblesAdapter).bubbles = viewModel.getPopularCompany()
+//            viewModel.pullFavors(stocksPage.recAdapter)
+            (rvPopularBubbles.adapter as BubblesRecyclerAdapter).bubbles = viewModel.getPopularCompany()
         }
     }
 
@@ -188,6 +186,7 @@ class StocksListActivity : AppCompatActivity() {
                     setFilledVisibilityOfSearch()
                 }
             }
+
             override fun afterTextChanged(p0: Editable?) {}
         })
     }

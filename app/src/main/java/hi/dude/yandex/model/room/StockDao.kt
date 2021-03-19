@@ -1,9 +1,7 @@
 package hi.dude.yandex.model.room
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import hi.dude.yandex.model.entities.Stock
-import hi.dude.yandex.viewmodel.StockHolder
+import hi.dude.yandex.model.entities.FavorStock
 
 @Dao
 interface StockDao {

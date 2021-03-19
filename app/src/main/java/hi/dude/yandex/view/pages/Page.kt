@@ -33,7 +33,7 @@ class Page(
         setListener()
     }
 
-    private fun setListener() {
+    private fun setListener() { // TODO: 20.03.2021 сделать чтобы поиск скрывался при свайпе вниз, а не при прокрутке
         recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (searchPanel == null) return
