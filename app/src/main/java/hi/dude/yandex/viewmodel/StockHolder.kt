@@ -8,6 +8,7 @@ import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import hi.dude.yandex.model.entities.FavorStock
+import hi.dude.yandex.model.entities.QueryResult
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -32,6 +33,8 @@ class StockHolder(
     )
 
     constructor(favor: FavorStock): this(favor.ticker, favor.company, favor.price, favor.currency)
+
+    constructor(result: QueryResult): this(result.ticker, result.company, null, result.currency)
 
     fun toFavor(): FavorStock {
         val bos = ByteArrayOutputStream()

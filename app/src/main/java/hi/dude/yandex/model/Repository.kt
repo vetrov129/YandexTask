@@ -34,7 +34,7 @@ class Repository private constructor() {
         private set
 
     val searchedQueries: MutableLiveData<List<String>> = MutableLiveData()
-    val queryResult: MutableLiveData<ArrayList<QueryResult>> = MutableLiveData()
+    val queryResults: MutableLiveData<ArrayList<QueryResult>> = MutableLiveData()
 
     suspend fun init(app: Application) = withContext(Dispatchers.IO) {
         val daoGetter = Room.databaseBuilder(app.applicationContext, DaoGetter::class.java, "stocks.sqlite")
@@ -85,7 +85,11 @@ class Repository private constructor() {
 
     suspend fun pullQueryResult(query: String, limit: Int) = withContext(Dispatchers.IO){
         val list = connector.getQueryResult(query, limit)
-        withContext(Dispatchers.Main) { queryResult.value = list }
+        withContext(Dispatchers.Main) { queryResults.value = list }
+    }
+
+    fun clearQueryResults() {
+        queryResults.value = ArrayList()
     }
 }
 

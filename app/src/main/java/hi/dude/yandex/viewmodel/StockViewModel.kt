@@ -45,7 +45,9 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
 
     // TODO: 18.03.2021 мб подтягивать в геттерах?
     val searchedQueries: LiveData<List<String>> = repository.searchedQueries
-    val queryResult: LiveData<ArrayList<QueryResult>> = repository.queryResult
+    val queryResults: LiveData<ArrayList<QueryResult>> = repository.queryResults
+
+    private var searchJob: Job = Job()
 
     fun pullFavors() {
         val favorJob = launch(handlerLong) { repository.pullFavors() }
@@ -160,7 +162,25 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         } // TODO: 20.03.2021 возможно нужно ждать окончания первого метода
     }
 
-    fun runSearch(query: String, limit: Int = 4) = launch {
-        repository.pullQueryResult(query, limit)
+    fun runSearch(query: String, limit: Int = 4) {
+        searchJob.cancel()
+        searchJob = launch {
+            repository.pullQueryResult(query, limit)
+        }
+    }
+
+    fun getResultHolders(): List<StockHolder> {
+        if (queryResults.value == null) {
+            Log.i("ViewModel", "getResultHolders: queryResults.value == null")
+            return ArrayList()
+        }
+        val holders = ArrayList<StockHolder>()
+        queryResults.value?.forEach { holders.add(StockHolder(it)) }
+        Log.i("ViewModel", "getResultHolders: queryResults.size ${queryResults.value?.size}")
+        return holders
+    }
+
+    fun clearQueryResults() {
+        repository.clearQueryResults()
     }
 }

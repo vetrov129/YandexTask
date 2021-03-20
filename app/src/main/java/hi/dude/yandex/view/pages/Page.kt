@@ -58,7 +58,8 @@ class Page(
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) { //check for scroll down
                     val manager = recycler.layoutManager as LinearLayoutManager
-                    if (manager.findLastVisibleItemPosition() >= recAdapter.countOfPacks * recAdapter.packSize - 10) {
+                    if (manager.findLastVisibleItemPosition() >=
+                        recAdapter.countOfPacks * recAdapter.packSize - recAdapter.offsetToScrollLoad) {
                         viewModel.addStocks(
                             recAdapter,
                             recAdapter.countOfPacks * recAdapter.packSize,

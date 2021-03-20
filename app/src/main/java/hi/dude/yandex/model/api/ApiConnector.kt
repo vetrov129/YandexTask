@@ -87,7 +87,7 @@ class ApiConnector {
                 url += token?.first + "=" + token?.second + "&"
             }
             url += API_KEY
-            Log.i(TAG, "getJson: $url")
+//            Log.i(TAG, "getJson: $url")
             var json: String? = null
             withContext(Dispatchers.Default) {
                 json = tryReadJsonThrice(url)

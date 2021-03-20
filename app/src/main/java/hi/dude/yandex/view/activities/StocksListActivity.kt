@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2
 import hi.dude.yandex.R
 import hi.dude.yandex.view.adapters.BubblesRecyclerAdapter
 import hi.dude.yandex.view.adapters.StocksPagerAdapter
+import hi.dude.yandex.view.adapters.StocksRecyclerAdapter
 import hi.dude.yandex.view.pages.Page
 import hi.dude.yandex.viewmodel.StockViewModel
 import kotlinx.android.synthetic.main.activity_stocks_list.*
@@ -39,6 +40,7 @@ class StocksListActivity : AppCompatActivity() {
         setUpPager()
         setUpHints()
         setUpSearchPanel()
+        setUpResultPanel()
     }
 
     private fun setDefaultVisibilityOfSearch() {
@@ -183,6 +185,7 @@ class StocksListActivity : AppCompatActivity() {
                 if (edSearch.text.toString() == "") {
                     setEmptyVisibilityOfSearch()
                 } else {
+                    viewModel.runSearch(edSearch.text.toString())
                     setFilledVisibilityOfSearch()
                 }
             }
@@ -191,15 +194,27 @@ class StocksListActivity : AppCompatActivity() {
         })
     }
 
+    private fun setUpResultPanel() {
+        val adapter = StocksRecyclerAdapter(viewModel.getResultHolders(), resources, this, viewModel) {}
+        rvResults.adapter = adapter
+        tvShowMore.setOnClickListener { showMoreClicked() }
+        viewModel.queryResults.observe(this) {
+            adapter.stocks = viewModel.getResultHolders()
+            viewModel.pullHolderData(0, adapter.stocks.size, adapter, adapter.stocks)
+        }
+    }
+
     private fun searchBackClicked() {
         // hide keyboard
         (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
             .hideSoftInputFromWindow(ibBackSearch.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
 
         viewModel.saveQuery(edSearch.text.toString())
+        viewModel.clearQueryResults()
         edSearch.text = "".toEditable()
         edSearch.clearFocus()
         setDefaultVisibilityOfSearch()
+        viewModel.clearQueryResults()
         // pull new favors
     }
 
@@ -210,6 +225,8 @@ class StocksListActivity : AppCompatActivity() {
 
     private fun showMoreClicked() {
         viewModel.saveQuery(edSearch.text.toString())
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+            .hideSoftInputFromWindow(ibBackSearch.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun editSearchFocusChanged(hasFocus: Boolean) {

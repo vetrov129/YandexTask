@@ -23,11 +23,11 @@ class StocksRecyclerAdapter(
         set(value) {
             field = value
             notifyDataSetChanged()
-//            viewModel.pullHolderData((countOfPacks - 1) * packSize, stocks.size, this, stocks)
         }
 
     var countOfPacks = 1
     val packSize = 20
+    val offsetToScrollLoad = 10
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(
