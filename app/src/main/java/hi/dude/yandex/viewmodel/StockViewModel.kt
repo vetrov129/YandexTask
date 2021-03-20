@@ -10,6 +10,7 @@ import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Stock
 import hi.dude.yandex.model.entities.FavorStock
 import hi.dude.yandex.model.entities.QueryResult
+import hi.dude.yandex.view.pages.Page
 import kotlinx.coroutines.*
 
 class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
@@ -133,10 +134,11 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         }
     }
 
-    fun getFavorHolders(): ArrayList<StockHolder> {
+    fun setFavorHolders(page: Page) {
         val holders = ArrayList<StockHolder>()
         favors.value?.forEach { holders.add(StockHolder(it)) }
-        return holders
+        page.stocks = holders
+        pullHolderData(0, holders.size, page.recAdapter, holders)
     }
 
     fun getPopularCompany(count: Int = 20): ArrayList<String> {

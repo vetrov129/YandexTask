@@ -106,7 +106,7 @@ class StocksListActivity : AppCompatActivity() {
             resources, this, viewModel, starClickedOnStocks
         )
         favorsPage = Page(
-            viewModel.getFavorHolders(), searchContainer,
+            ArrayList(), searchContainer,
             resources, this, viewModel, starClickedOnFavors
         )
     }
@@ -124,7 +124,9 @@ class StocksListActivity : AppCompatActivity() {
                 if (viewPager2.currentItem == 0) {
                     stocksPage.recAdapter.notifyDataSetChanged()
                 } else {
-                    favorsPage.stocks = viewModel.getFavorHolders()
+//                    favorsPage.stocks = viewModel.getFavorHolders()
+//                    viewModel.pullHolderData(0, favorsPage.stocks.size, favorsPage.recAdapter, favorsPage.stocks)
+                    viewModel.setFavorHolders(favorsPage)
                 }
             }
         })
@@ -142,7 +144,7 @@ class StocksListActivity : AppCompatActivity() {
         }
         viewModel.favors.observe(this) {
             Log.i("ListActivity", "subscribe: favors")
-            favorsPage.stocks = viewModel.getFavorHolders()
+            viewModel.setFavorHolders(favorsPage)
         }
         viewModel.allStocks.observe(this) {
             Log.i("ListActivity", "subscribe: allStocks")
@@ -195,7 +197,18 @@ class StocksListActivity : AppCompatActivity() {
     }
 
     private fun setUpResultPanel() {
-        val adapter = StocksRecyclerAdapter(viewModel.getResultHolders(), resources, this, viewModel) {}
+        val adapter = StocksRecyclerAdapter(viewModel.getResultHolders(),
+            resources, this, viewModel) {}
+
+        val starClicked: (Int) -> Unit = {
+            if (viewModel.checkIsFavor(adapter.stocks[it].ticker))
+                viewModel.deleteFavor(adapter.stocks[it], adapter, it)
+            else
+                viewModel.saveFavor(adapter.stocks[it], adapter, it)
+        }
+
+        adapter.starClicked = starClicked
+
         rvResults.adapter = adapter
         tvShowMore.setOnClickListener { showMoreClicked() }
         viewModel.queryResults.observe(this) {

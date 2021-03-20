@@ -1,7 +1,9 @@
 package hi.dude.yandex.view.pages
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Resources
+import android.view.MotionEvent
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +36,7 @@ class Page(
         setListener()
     }
 
-    private fun setListener() { // TODO: 20.03.2021 сделать чтобы поиск скрывался при свайпе вниз, а не при прокрутке
+    private fun setListener() {
         recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (searchPanel == null) return
@@ -48,18 +50,19 @@ class Page(
                         readyToHide = false
                     }
                 }
-                readyToHide =
-                    recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE ||
-                            recyclerView.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
+                readyToHide = recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE ||
+                              recyclerView.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
 
             }
         })
+
         recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) { //check for scroll down
                     val manager = recycler.layoutManager as LinearLayoutManager
                     if (manager.findLastVisibleItemPosition() >=
-                        recAdapter.countOfPacks * recAdapter.packSize - recAdapter.offsetToScrollLoad) {
+                        recAdapter.countOfPacks * recAdapter.packSize - recAdapter.offsetToScrollLoad
+                    ) {
                         viewModel.addStocks(
                             recAdapter,
                             recAdapter.countOfPacks * recAdapter.packSize,

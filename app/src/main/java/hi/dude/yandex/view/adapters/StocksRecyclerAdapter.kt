@@ -16,7 +16,7 @@ class StocksRecyclerAdapter(
     private val resources: Resources,
     private val context: Context,
     private val viewModel: StockViewModel,
-    private val starClicked: (Int) -> Unit
+    var starClicked: (Int) -> Unit
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var stocks: List<StockHolder> = stocks
