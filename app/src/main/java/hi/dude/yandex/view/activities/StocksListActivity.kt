@@ -3,6 +3,7 @@ package hi.dude.yandex.view.activities
 import android.animation.AnimatorInflater
 import android.content.Context
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -41,6 +42,16 @@ class StocksListActivity : AppCompatActivity() {
         setUpHints()
         setUpSearchPanel()
         setUpResultPanel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.cancel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.resume()
     }
 
     private fun setDefaultVisibilityOfSearch() {
@@ -240,6 +251,7 @@ class StocksListActivity : AppCompatActivity() {
         viewModel.saveQuery(edSearch.text.toString())
         (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
             .hideSoftInputFromWindow(ibBackSearch.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        viewModel.runSearch(edSearch.text.toString(), 20)
     }
 
     private fun editSearchFocusChanged(hasFocus: Boolean) {

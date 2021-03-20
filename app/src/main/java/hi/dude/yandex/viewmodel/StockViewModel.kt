@@ -10,6 +10,7 @@ import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Stock
 import hi.dude.yandex.model.entities.FavorStock
 import hi.dude.yandex.model.entities.QueryResult
+import hi.dude.yandex.view.activities.StocksListActivity
 import hi.dude.yandex.view.pages.Page
 import kotlinx.coroutines.*
 
@@ -49,6 +50,17 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
     val queryResults: LiveData<ArrayList<QueryResult>> = repository.queryResults
 
     private var searchJob: Job = Job()
+
+    fun cancel() {
+        job.cancel()
+    }
+
+    fun resume() {
+        if (job.isCancelled) {
+            job = SupervisorJob()
+            coroutineContext = Dispatchers.Main + job
+        }
+    }
 
     fun pullFavors() {
         val favorJob = launch(handlerLong) { repository.pullFavors() }
