@@ -11,7 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.net.URL
-import java.net.UnknownHostException
+
 // this class (and not Retrofit for example) is used to bypass the limit on the number of requests per day
 class ApiConnector {
     private companion object {
@@ -89,29 +89,32 @@ class ApiConnector {
             url += API_KEY
             Log.i(TAG, "getJson: $url")
             var json: String? = null
-
             withContext(Dispatchers.Default) {
-                json = try {
-                    URL(url).readText()
-                } catch (e: UnknownHostException) {
-                    Log.e(TAG, "getJson:", e)
-                    null
-                } catch (e: FileNotFoundException) {
-                    delay(1000)  // code 429 Too Many Requests
-                    try {
-                        URL(url).readText()
-                    } catch (e: FileNotFoundException) {
-                        Log.e(TAG, "getJson:", e)
-                        null
-                    }
-
-                }
+                json = tryReadJsonThrice(url)
             }
-
             if (json == NEED_UPDATE_KEY_RESPONSE)   // key change if the limit is exceeded
                 updateKey()
             else
                 return json
+        }
+    }
+
+    private suspend fun tryReadJsonThrice(url: String): String? {  // TODO: 20.03.2021 нужно придумать механизм,
+        return try {                      // чтобы ставить на паузу подгрузку, когда сервак включает защиту от дудоса
+            URL(url).readText()
+        } catch (e: FileNotFoundException) { // code 429 Too Many Requests
+            delay(1000)
+            try {
+                URL(url).readText()
+            } catch (e: FileNotFoundException) {
+                try {
+                    delay(5000)
+                    URL(url).readText()
+                } catch (e: FileNotFoundException) {
+                    Log.e(TAG, "getJson:", e)
+                    null
+                }
+            }
         }
     }
 

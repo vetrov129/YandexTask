@@ -136,7 +136,7 @@ class StocksListActivity : AppCompatActivity() {
     private fun subscribeStocks() {
         viewModel.stocks.observe(this) {
             Log.i("ListActivity", "subscribe: stocks")
-            stocksPage.stocks = it
+            stocksPage.stocks = it ?: ArrayList()
         }
         viewModel.favors.observe(this) {
             Log.i("ListActivity", "subscribe: favors")

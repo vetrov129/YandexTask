@@ -23,8 +23,11 @@ class StocksRecyclerAdapter(
         set(value) {
             field = value
             notifyDataSetChanged()
-            viewModel.pullHolderData(0, stocks.size, this, stocks)
+//            viewModel.pullHolderData((countOfPacks - 1) * packSize, stocks.size, this, stocks)
         }
+
+    var countOfPacks = 1
+    val packSize = 20
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(

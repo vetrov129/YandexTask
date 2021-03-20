@@ -61,14 +61,14 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
 
     fun addStocks(adapter: RecyclerView.Adapter<*>, start: Int = 0, until: Int = 20) {
         try {
-            val newList = ArrayList<StockHolder>()
-            if (mutableStocks.value != null)
-                newList.addAll(mutableStocks.value!!)
-            for (i in start until until) {
-                newList.add(StockHolder(allStocks.value!![i]))
+            if (mutableStocks.value == null) {
+                mutableStocks.value = ArrayList()
             }
-            mutableStocks.value = newList
-            adapter.notifyDataSetChanged()
+            for (i in start until until) {
+                mutableStocks.value?.add(StockHolder(allStocks.value!![i]))
+            }
+            adapter.notifyItemRangeInserted(start, until - start)
+            pullHolderData(start, until, adapter, mutableStocks.value)
         } catch (e: IndexOutOfBoundsException) {
             Log.e("ViewModel", "addStocks: end of list, added ${stocks.value?.size}")
         } catch (e: NullPointerException) {
@@ -76,8 +76,10 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         }
     }
 
-    fun pullHolderData(start: Int, end: Int, adapter: RecyclerView.Adapter<*>, list: List<StockHolder>) {
-        for (position in start until end) {
+    fun pullHolderData(start: Int, until: Int, adapter: RecyclerView.Adapter<*>, list: List<StockHolder>?) {
+        if (list == null)
+            return
+        for (position in start until until) {
             val image = launch(handlerLong) {
                 try {
                     list[position].pullImage(list[position].ticker)

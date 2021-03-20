@@ -3,6 +3,7 @@ package hi.dude.yandex.view.pages
 import android.content.Context
 import android.content.res.Resources
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import hi.dude.yandex.view.adapters.StocksRecyclerAdapter
 import hi.dude.yandex.viewmodel.StockHolder
@@ -51,7 +52,21 @@ class Page(
                     recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE ||
                             recyclerView.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
 
-                // TODO: 19.03.2021 сделать добавление элементов пачками
+            }
+        })
+        recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) { //check for scroll down
+                    val manager = recycler.layoutManager as LinearLayoutManager
+                    if (manager.findLastVisibleItemPosition() >= recAdapter.countOfPacks * recAdapter.packSize - 10) {
+                        viewModel.addStocks(
+                            recAdapter,
+                            recAdapter.countOfPacks * recAdapter.packSize,
+                            (recAdapter.countOfPacks + 1) * recAdapter.packSize,
+                        )
+                        recAdapter.countOfPacks++
+                    }
+                }
             }
         })
     }
