@@ -11,6 +11,8 @@ import java.io.FileNotFoundException
 import java.net.URL
 import java.time.LocalDate
 import java.time.Period
+import java.util.*
+import kotlin.collections.ArrayList
 
 // this class (and not Retrofit for example) is used to bypass the limit on the number of requests per day
 class ApiConnector {
@@ -19,7 +21,6 @@ class ApiConnector {
 
         const val API_URL = "https://financialmodelingprep.com/api/v3"
 
-        var keyIndex = 0
         val keyArray = arrayOf(
             "60ee277f0cde9daa7705f6a79b1f47ba",
             "5b19fce62961a4207f6b574e47f242ba",
@@ -44,8 +45,6 @@ class ApiConnector {
             "6b574ce345b0fe3370403ac4ae9c07b2"
         )
 
-        var API_KEY = "apikey=${keyArray[keyIndex]}"
-
         const val NEED_UPDATE_KEY_RESPONSE =
             "{\"Error Message\" : \"Limit Reach . " +
                     "Please upgrade your plan or visit our " +
@@ -66,37 +65,42 @@ class ApiConnector {
         }
     }
 
+    private val keys = LinkedList<String>()
+
+    init { keys.addAll(keyArray) }
+
     private val gson = Gson()
-
-    private fun updateKey() {
-        try {
-            keyIndex++
-            API_KEY = "apikey=${keyArray[keyIndex]}"
-            Log.i(TAG, "updateKey: key ${keyIndex + 1}/${keyArray.size}")
-        } catch (e: IndexOutOfBoundsException) {
-            Log.e(TAG, "updateKey: the keys are out, daily request limit exceeded")
-        }
-    }
-
 
     private suspend fun getJson(request: REQUEST, tickerKey: String?, vararg tokens: Pair<String, String>?): String? {
         while (true) {
-            var url = "$API_URL${request.text}"
-            if (tickerKey != null) url += "$tickerKey?"
-            for (token in tokens) {
-                url += token?.first + "=" + token?.second + "&"
-            }
-            url += API_KEY
-//            Log.i(TAG, "getJson: $url")
-            var json: String? = null
+            val url = buildUrl(request, tickerKey, tokens)
+            var json: String?
             withContext(Dispatchers.Default) {
                 json = tryReadJsonThrice(url)
             }
-            if (json == NEED_UPDATE_KEY_RESPONSE)   // key change if the limit is exceeded
-                updateKey()
+
+            val currentKey = keys.first
+            if (json == NEED_UPDATE_KEY_RESPONSE) {  // key change if the limit is exceeded
+                keys.remove(currentKey)
+                if (keys.size == 0) {
+                    Log.e(TAG, "updateKey: the keys are out, daily request limit exceeded")
+                    return null
+                }
+                Log.i(TAG, "getJson: key ${keyArray.size - keys.size + 1}/${keyArray.size}")
+            }
             else
                 return json
         }
+    }
+
+    private fun buildUrl(request: REQUEST, tickerKey: String?, tokens: Array<out Pair<String, String>?>): String {
+        var url = "$API_URL${request.text}"
+        if (tickerKey != null) url += "$tickerKey?"
+        for (token in tokens) {
+            url += token?.first + "=" + token?.second + "&"
+        }
+        url += "apikey=${keys.first}"
+        return url
     }
 
     private suspend fun tryReadJsonThrice(url: String): String? {  // TODO: 20.03.2021 нужно придумать механизм,
