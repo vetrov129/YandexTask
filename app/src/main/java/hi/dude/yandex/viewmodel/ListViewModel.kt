@@ -12,20 +12,21 @@ import hi.dude.yandex.model.entities.FavorStock
 import hi.dude.yandex.model.entities.QueryResult
 import hi.dude.yandex.view.pages.Page
 import kotlinx.coroutines.*
+import java.net.UnknownHostException
 
 class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
 
     private var job = SupervisorJob()
     override var coroutineContext = Dispatchers.Main + job
 
-    private val handler = CoroutineExceptionHandler { _, exception ->
+    private val logHandler = CoroutineExceptionHandler { _, exception ->
         println("EXCEPTION/VIEWMODEL: \n${exception.printStackTrace()}}")
     }
 
     private val repository = Repository.getInstance()
 
     init {
-        val repositoryJob = launch(handler) {
+        val repositoryJob = launch(logHandler) {
             repository.init(app)
         }
         launch {
@@ -33,7 +34,7 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
             pullFavors()
             pullSearchedQueries()
         }
-        launch(handler) {
+        launch(logHandler) {
             repository.pullAllStocks()
         }
     }
@@ -62,8 +63,8 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     }
 
     fun pullFavors() {
-        val favorJob = launch(handler) { repository.pullFavors() }
-        launch(handler) {
+        val favorJob = launch(logHandler) { repository.pullFavors() }
+        launch(logHandler) {
             favorJob.join()
             repository.fillFavorSet()
         }
@@ -94,14 +95,14 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         if (list == null)
             return
         for (position in start until until) {
-            val image = launch(handler) {
+            val image = launch(logHandler) {
                 try {
                     list[position].pullImage(list[position].ticker)
                 } catch (e: IndexOutOfBoundsException) {
                     Log.e("ViewModel", "pullHolderData: end of list")
                 }
             }
-            val price = launch(handler) {
+            val price = launch(logHandler) {
                 image.join()
                 adapter.notifyItemChanged(position)
                 try {
@@ -110,34 +111,34 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
                     Log.e("ViewModel", "pullHolderData: end of list")
                 }
             }
-            launch(handler) {
+            launch(logHandler) {
                 price.join()
                 adapter.notifyItemChanged(position)
             }
         }
     }
 
-    fun deleteFavor(favor: StockHolder) = launch(handler) {
+    fun deleteFavor(favor: StockHolder) = launch(logHandler) {
         repository.deleteFavor(favor.toFavor())
         pullFavors()
     }
 
     fun deleteFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
         val favorJob = deleteFavor(favor)
-        launch(handler) {
+        launch(logHandler) {
             favorJob.join()
             adapter.notifyItemChanged(position)
         }
     }
 
-    fun saveFavor(favor: StockHolder) = launch(handler) {
+    fun saveFavor(favor: StockHolder) = launch(logHandler) {
         repository.saveFavor(favor.toFavor())
         pullFavors()
     }
 
     fun saveFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
         val favorJob = saveFavor(favor)
-        launch(handler) {
+        launch(logHandler) {
             favorJob.join()
             adapter.notifyItemChanged(position)
         }
@@ -162,11 +163,11 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         return companies
     }
 
-    fun pullSearchedQueries(count: Int = 30) = launch(handler) {
+    fun pullSearchedQueries(count: Int = 30) = launch(logHandler) {
         repository.pullSearchedQueries(count)
     }
 
-    fun saveQuery(query: String) = launch(handler) {
+    fun saveQuery(query: String) = launch(logHandler) {
         if (query != "") {
             repository.saveQuery(query)
             repository.pullSearchedQueries()
@@ -175,7 +176,7 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
 
     fun runSearch(query: String, limit: Int = 4) {
         searchJob.cancel()
-        searchJob = launch(handler) {
+        searchJob = launch(logHandler) {
             repository.pullQueryResult(query, limit)
         }
     }

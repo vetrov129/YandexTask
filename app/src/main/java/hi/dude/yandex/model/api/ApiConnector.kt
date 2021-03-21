@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.net.URL
+import java.net.UnknownHostException
 import java.time.LocalDate
 import java.time.Period
 import java.util.*
@@ -71,12 +72,22 @@ class ApiConnector {
 
     private val gson = Gson()
 
+    @JvmName("getJson1")
     private suspend fun getJson(request: REQUEST, tickerKey: String?, vararg tokens: Pair<String, String>?): String? {
+        return getJson(request, tickerKey, tokens)
+    }
+
+    private suspend fun getJson(request: REQUEST, tickerKey: String?, tokens: Array<out Pair<String, String>?>): String? {
         while (true) {
             val url = buildUrl(request, tickerKey, tokens)
             var json: String?
             withContext(Dispatchers.Default) {
-                json = tryReadJsonThrice(url)
+                try {
+                    json = tryReadJsonThrice(url)
+                } catch (e: UnknownHostException) {
+                    delay(2500)
+                    json = getJson(request, tickerKey, tokens)
+                }
             }
 
             val currentKey = keys.first
