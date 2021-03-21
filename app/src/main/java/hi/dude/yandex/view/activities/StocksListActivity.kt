@@ -55,20 +55,24 @@ class StocksListActivity : AppCompatActivity() {
     }
 
     private fun setDefaultVisibilityOfSearch() {
+        if (progressBar.visibility == View.GONE) {
+            viewPager2.visibility = View.VISIBLE
+        }
         edSearch.setHintTextColor(resources.getColor(R.color.colorBlack))
         resultContainer.visibility = View.GONE
         hintsContainer.visibility = View.GONE
         ibBackSearch.visibility = View.GONE
         ibClearSearch.visibility = View.GONE
         ibSearch.visibility = View.VISIBLE
-        viewPager2.visibility = View.VISIBLE
         tabsContainer.visibility = View.VISIBLE
     }
 
     private fun setEmptyVisibilityOfSearch() {
+        if (progressBar.visibility == View.GONE) {
+            resultContainer.visibility = View.GONE
+            hintsContainer.visibility = View.VISIBLE
+        }
         edSearch.setHintTextColor(resources.getColor(R.color.colorPrimary))
-        resultContainer.visibility = View.GONE
-        hintsContainer.visibility = View.VISIBLE
         ibBackSearch.visibility = View.VISIBLE
         ibClearSearch.visibility = View.GONE
         ibSearch.visibility = View.GONE
@@ -77,14 +81,16 @@ class StocksListActivity : AppCompatActivity() {
     }
 
     private fun setFilledVisibilityOfSearch() {
-        edSearch.setHintTextColor(resources.getColor(R.color.colorPrimary))
-        resultContainer.visibility = View.VISIBLE
+        if (progressBar.visibility == View.GONE) {
+            resultContainer.visibility = View.VISIBLE
+        }
         hintsContainer.visibility = View.GONE
         ibBackSearch.visibility = View.VISIBLE
         ibClearSearch.visibility = View.VISIBLE
         ibSearch.visibility = View.GONE
         viewPager2.visibility = View.GONE
         tabsContainer.visibility = View.GONE
+        edSearch.setHintTextColor(resources.getColor(R.color.colorPrimary))
     }
 
     private fun setUpHints() {
@@ -135,8 +141,6 @@ class StocksListActivity : AppCompatActivity() {
                 if (viewPager2.currentItem == 0) {
                     stocksPage.recAdapter.notifyDataSetChanged()
                 } else {
-//                    favorsPage.stocks = viewModel.getFavorHolders()
-//                    viewModel.pullHolderData(0, favorsPage.stocks.size, favorsPage.recAdapter, favorsPage.stocks)
                     viewModel.setFavorHolders(favorsPage)
                 }
             }
@@ -161,7 +165,7 @@ class StocksListActivity : AppCompatActivity() {
             viewPager2.visibility = View.VISIBLE
             progressBar.visibility = View.GONE
             Log.i("ListActivity", "subscribe: allStocks")
-            viewModel.pullFavors() // TODO: 20.03.2021 надо постараться вызывать этот метод раньше
+//            viewModel.pullFavors() // TODO: 20.03.2021 надо постараться вызывать этот метод раньше
             viewModel.addStocks(stocksPage.recAdapter)
 //            viewModel.pullFavors(stocksPage.recAdapter)
             (rvPopularBubbles.adapter as BubblesRecyclerAdapter).bubbles = viewModel.getPopularCompany()

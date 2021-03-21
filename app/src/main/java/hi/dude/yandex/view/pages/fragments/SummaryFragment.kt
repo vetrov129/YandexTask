@@ -33,6 +33,7 @@ class SummaryFragment(val ticker: String, val viewModel: CardViewModel): Fragmen
     private fun setUpText(summary: Summary?) {
         if (summary == null) {
             setTextVisibility(View.GONE)
+            Log.i("Summary", "setUpText: SUMMARY NULL")
             return
         }
 
@@ -64,6 +65,8 @@ class SummaryFragment(val ticker: String, val viewModel: CardViewModel): Fragmen
     }
 
     private fun setTextVisibility(visibility: Int) {
+        labelDescription.visibility = visibility
+        summaryShowMore.visibility = visibility
         tvDescription.visibility = visibility
         cardIndustry.visibility = visibility
         cardCeo.visibility = visibility

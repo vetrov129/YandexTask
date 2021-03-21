@@ -25,11 +25,16 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     private val repository = Repository.getInstance()
 
     init {
-        launch(handler) {
+        val repositoryJob = launch(handler) {
             repository.init(app)
+        }
+        launch {
+            repositoryJob.join()
+            pullFavors()
+            pullSearchedQueries()
+        }
+        launch(handler) {
             repository.pullAllStocks()
-            repository.pullFavors()
-            repository.pullSearchedQueries()
         }
     }
 
@@ -170,7 +175,7 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
 
     fun runSearch(query: String, limit: Int = 4) {
         searchJob.cancel()
-        searchJob = launch {
+        searchJob = launch(handler) {
             repository.pullQueryResult(query, limit)
         }
     }

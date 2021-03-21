@@ -76,7 +76,7 @@ class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     }
 
     fun pullNews(ticker: String, limit: Int = 20) {
-        launch { repository.pullNews(ticker, limit) }
+        launch(handler) { repository.pullNews(ticker, limit) }
     }
 
     fun pullNewsImages(adapter: RecyclerView.Adapter<*>) {

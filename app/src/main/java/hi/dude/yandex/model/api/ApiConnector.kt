@@ -186,15 +186,15 @@ class ApiConnector {
 
     private fun toYear(): Pair<String, String> = Pair("to", LocalDate.now().toString())
 
-    suspend fun getSummary(ticker: String): Summary {
+    suspend fun getSummary(ticker: String): Summary? {
         val type = object : TypeToken<ArrayList<Summary?>?>() {}.type
         val json = getJson(REQUEST.SUMMARY, ticker)
         return try {
             (gson.fromJson(json, type) as ArrayList<Summary>)[0]
         } catch (e: IndexOutOfBoundsException) {
-            Summary("", "", "", "", "", "")
+            null
         } catch (e: NullPointerException) {
-            Summary("", "", "", "", "", "")
+            null
         }
     }
 

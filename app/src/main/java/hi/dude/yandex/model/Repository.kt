@@ -61,14 +61,10 @@ class Repository private constructor() {
     }
 
     suspend fun pullAllStocks() {
-        try {
-            allStocks.value = connector.getAllStocks()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
+        allStocks.value = connector.getAllStocks()
     }
 
-    suspend fun pullFavors() = withContext(Dispatchers.IO){
+    suspend fun pullFavors() = withContext(Dispatchers.IO) {
         val list = favorDao.getAll()
         withContext(Dispatchers.Main) { favors.value = list }
     }
@@ -100,7 +96,7 @@ class Repository private constructor() {
         }
     }
 
-    suspend fun pullQueryResult(query: String, limit: Int) = withContext(Dispatchers.IO){
+    suspend fun pullQueryResult(query: String, limit: Int) = withContext(Dispatchers.IO) {
         val list = connector.getQueryResult(query, limit)
         withContext(Dispatchers.Main) { queryResults.value = list }
     }
@@ -140,7 +136,7 @@ class Repository private constructor() {
     }
 
     suspend fun pullSummary(ticker: String) = withContext(Dispatchers.IO) {
-        val data =  connector.getSummary(ticker)
+        val data = connector.getSummary(ticker)
         withContext(Dispatchers.Main) { summary.value = data }
     }
 
