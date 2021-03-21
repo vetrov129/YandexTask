@@ -2,6 +2,7 @@ package hi.dude.yandex.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import hi.dude.yandex.model.entities.ChartLine
 import hi.dude.yandex.model.entities.Stock
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -69,18 +70,13 @@ class DataFormatter {
             return holders
         }
 
-        fun fromYear(): Pair<String, String> = Pair("from", (LocalDate.now() - Period.of(1, 0, 0)).toString())
-
-        fun toYear(): Pair<String, String> = Pair("to", LocalDate.now().toString())
-
-        fun previousDay(): LocalDateTime = LocalDateTime.now() - Period.of(0, 0, 1)
-
-        fun previousWeek(): LocalDateTime = LocalDateTime.now() - Period.of(0, 0, 7)
-
-        fun previousMonth(): LocalDateTime = LocalDateTime.now() - Period.of(0, 1, 0)
-
-        fun previousSixMonth(): LocalDateTime = LocalDateTime.now() - Period.of(0, 6, 0)
-
+        private fun deleteOlderThen(array: ArrayList<ChartLine>?, date: LocalDateTime): ArrayList<ChartLine> {
+            if (array == null) return ArrayList()
+            array.removeIf {
+                LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) < date
+            }
+            return array
+        }
 
         fun toPrettyDate(date: String?): String {
             if (date == null) return ""

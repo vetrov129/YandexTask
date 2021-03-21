@@ -17,17 +17,4 @@ data class NewsItem(
 ) {
     var imageBitmap: Bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
     var fullSize = false
-
-        fun pullImage() {
-        val connection = URL(imageUrl).openConnection()
-        connection.doInput = true
-        connection.connect()
-        try {
-            imageBitmap = BitmapFactory.decodeStream(connection.getInputStream())
-            Log.i("NewsItem", "pullImage: $imageUrl")
-        } catch (e: FileNotFoundException) {
-            Log.e("NewsItem", "pullImage: not found image $imageUrl")
-        }
-
-    }
 }

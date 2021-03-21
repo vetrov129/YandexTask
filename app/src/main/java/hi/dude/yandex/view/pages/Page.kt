@@ -1,22 +1,20 @@
 package hi.dude.yandex.view.pages
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Resources
-import android.view.MotionEvent
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import hi.dude.yandex.view.adapters.StocksRecyclerAdapter
 import hi.dude.yandex.viewmodel.StockHolder
-import hi.dude.yandex.viewmodel.StockViewModel
+import hi.dude.yandex.viewmodel.ListViewModel
 
 class Page(
     stocks: List<StockHolder>,
     val searchPanel: View?,
     resources: Resources,
     context: Context,
-    private val viewModel: StockViewModel,
+    private val viewModel: ListViewModel,
     starClicked: (Int) -> Unit
 ) {
     private var readyToHide = true

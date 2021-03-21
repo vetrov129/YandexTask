@@ -3,7 +3,6 @@ package hi.dude.yandex.view.activities
 import android.animation.AnimatorInflater
 import android.content.Context
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -18,14 +17,14 @@ import hi.dude.yandex.view.adapters.BubblesRecyclerAdapter
 import hi.dude.yandex.view.adapters.StocksPagerAdapter
 import hi.dude.yandex.view.adapters.StocksRecyclerAdapter
 import hi.dude.yandex.view.pages.Page
-import hi.dude.yandex.viewmodel.StockViewModel
+import hi.dude.yandex.viewmodel.ListViewModel
 import kotlinx.android.synthetic.main.activity_stocks_list.*
 
 
 class StocksListActivity : AppCompatActivity() {
 
     private lateinit var vpAdapter: StocksPagerAdapter
-    private lateinit var viewModel: StockViewModel
+    private lateinit var viewModel: ListViewModel
 
     private lateinit var stocksPage: Page
     private lateinit var favorsPage: Page
@@ -35,7 +34,7 @@ class StocksListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_stocks_list)
 
         supportActionBar?.hide()
-        viewModel = StockViewModel(application)
+        viewModel = ListViewModel(application)
 
         setDefaultVisibilityOfSearch()
         setUpPager()

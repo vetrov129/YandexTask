@@ -55,7 +55,7 @@
     <TextView
             android:id="@+id/tvWeek"
             android:text="@string/w"
-            style="@style/PeriodButtonSelected"
+            style="@style/PeriodButtonNotSelected"
             app:layout_constraintStart_toEndOf="@+id/tvDay"
             app:layout_constraintTop_toBottomOf="@id/chart"
             app:layout_constraintEnd_toStartOf="@+id/tvMonth"
@@ -91,7 +91,7 @@
     <TextView
             android:id="@+id/tvAll"
             android:text="@string/all"
-            style="@style/PeriodButtonNotSelected"
+            style="@style/PeriodButtonSelected"
             app:layout_constraintTop_toBottomOf="@id/chart"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="16dp"

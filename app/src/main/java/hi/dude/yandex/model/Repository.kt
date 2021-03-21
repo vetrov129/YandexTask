@@ -29,12 +29,23 @@ class Repository private constructor() {
     private lateinit var favorDao: StockDao
     private lateinit var queryDao: QueryDao
 
+    val favorTickerSet = HashSet<String>()
+
+    // list data
     val allStocks: MutableLiveData<ArrayList<Stock>> = MutableLiveData()
     var favors: MutableLiveData<List<FavorStock>> = MutableLiveData()
-        private set
-
     val searchedQueries: MutableLiveData<List<String>> = MutableLiveData()
     val queryResults: MutableLiveData<ArrayList<QueryResult>> = MutableLiveData()
+
+    // card data
+    val dayChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
+    val weekChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
+    val monthChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
+    val sixMonthChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
+    val yearChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
+    val allTimeChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
+    val summary: MutableLiveData<Summary> = MutableLiveData()
+    val news: MutableLiveData<ArrayList<NewsItem>> = MutableLiveData()
 
     suspend fun init(app: Application) = withContext(Dispatchers.IO) {
         val daoGetter = Room.databaseBuilder(app.applicationContext, DaoGetter::class.java, "stocks.sqlite")
@@ -43,6 +54,10 @@ class Repository private constructor() {
 
         favorDao = daoGetter.getStockDao()
         queryDao = daoGetter.getQueryDao()
+    }
+
+    fun fillFavorSet() {
+        favors.value?.forEach { favorTickerSet.add(it.ticker) }
     }
 
     suspend fun pullAllStocks() {
@@ -63,10 +78,12 @@ class Repository private constructor() {
     }
 
     suspend fun deleteFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
+        favorTickerSet.remove(favor.ticker)
         favorDao.delete(favor)
     }
 
     suspend fun saveFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
+        favorTickerSet.add(favor.ticker)
         favorDao.save(favor)
     }
 
@@ -90,6 +107,58 @@ class Repository private constructor() {
 
     fun clearQueryResults() {
         queryResults.value = ArrayList()
+    }
+
+    suspend fun pullDayChartData(ticker: String) = withContext(Dispatchers.IO) {
+        val list = connector.getDayChartData(ticker)
+        withContext(Dispatchers.Main) { dayChart.value = list }
+    }
+
+    suspend fun pullWeekChartData(ticker: String) = withContext(Dispatchers.IO) {
+        val list = connector.getWeekChartData(ticker)
+        withContext(Dispatchers.Main) { weekChart.value = list }
+    }
+
+    suspend fun pullMonthChartData(ticker: String) = withContext(Dispatchers.IO) {
+        val list = connector.getMonthChartData(ticker)
+        withContext(Dispatchers.Main) { monthChart.value = list }
+    }
+
+    suspend fun pullSixMonthChartData(ticker: String) = withContext(Dispatchers.IO) {
+        val list = connector.getSixMonthChartData(ticker)
+        withContext(Dispatchers.Main) { sixMonthChart.value = list }
+    }
+
+    suspend fun pullYearChartData(ticker: String) = withContext(Dispatchers.IO) {
+        val list = connector.getYearChartData(ticker)
+        withContext(Dispatchers.Main) { yearChart.value = list }
+    }
+
+    suspend fun pullAllTimeChartData(ticker: String) = withContext(Dispatchers.IO) {
+        val list = connector.getAllTimeChartData(ticker)
+        withContext(Dispatchers.Main) { allTimeChart.value = list }
+    }
+
+    suspend fun pullSummary(ticker: String) = withContext(Dispatchers.IO) {
+        val data =  connector.getSummary(ticker)
+        withContext(Dispatchers.Main) { summary.value = data }
+    }
+
+    suspend fun pullNews(ticker: String, limit: Int) = withContext(Dispatchers.IO) {
+        val list = connector.getNews(ticker, limit)
+        withContext(Dispatchers.Main) { news.value = list }
+    }
+
+    fun clearCardData() {
+        dayChart.value = ArrayList()
+        weekChart.value = ArrayList()
+        monthChart.value = ArrayList()
+        sixMonthChart.value = ArrayList()
+        yearChart.value = ArrayList()
+        allTimeChart.value = ArrayList()
+
+        summary.value = null
+        news.value = ArrayList()
     }
 }
 

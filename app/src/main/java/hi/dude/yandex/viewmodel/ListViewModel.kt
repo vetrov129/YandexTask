@@ -10,27 +10,22 @@ import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.Stock
 import hi.dude.yandex.model.entities.FavorStock
 import hi.dude.yandex.model.entities.QueryResult
-import hi.dude.yandex.view.activities.StocksListActivity
 import hi.dude.yandex.view.pages.Page
 import kotlinx.coroutines.*
 
-class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
+class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
 
     private var job = SupervisorJob()
     override var coroutineContext = Dispatchers.Main + job
 
-    private val handlerLong = CoroutineExceptionHandler { _, exception ->
-        println("EXCEPTION/VIEWMODEL: Caught ${exception.printStackTrace()}}")
-    }
-
-    private val handlerShort = CoroutineExceptionHandler { _, exception ->
-        println("EXCEPTION/VIEWMODEL: Caught $exception}")
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        println("EXCEPTION/VIEWMODEL: \n${exception.printStackTrace()}}")
     }
 
     private val repository = Repository.getInstance()
 
     init {
-        launch(handlerLong) {
+        launch(handler) {
             repository.init(app)
             repository.pullAllStocks()
             repository.pullFavors()
@@ -39,13 +34,12 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
     }
 
     private val mutableStocks = MutableLiveData<ArrayList<StockHolder>>()
-    private val favorTickerSet = HashSet<String>()
+    private val favorTickerSet = repository.favorTickerSet
 
     val favors: LiveData<List<FavorStock>> = repository.favors
     val stocks: LiveData<ArrayList<StockHolder>> = mutableStocks
     val allStocks: LiveData<ArrayList<Stock>> = repository.allStocks
 
-    // TODO: 18.03.2021 мб подтягивать в геттерах?
     val searchedQueries: LiveData<List<String>> = repository.searchedQueries
     val queryResults: LiveData<ArrayList<QueryResult>> = repository.queryResults
 
@@ -63,10 +57,10 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
     }
 
     fun pullFavors() {
-        val favorJob = launch(handlerLong) { repository.pullFavors() }
-        launch(handlerLong) {
+        val favorJob = launch(handler) { repository.pullFavors() }
+        launch(handler) {
             favorJob.join()
-            favors.value?.forEach { favorTickerSet.add(it.ticker) }
+            repository.fillFavorSet()
         }
     }
 
@@ -95,14 +89,14 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         if (list == null)
             return
         for (position in start until until) {
-            val image = launch(handlerLong) {
+            val image = launch(handler) {
                 try {
                     list[position].pullImage(list[position].ticker)
                 } catch (e: IndexOutOfBoundsException) {
                     Log.e("ViewModel", "pullHolderData: end of list")
                 }
             }
-            val price = launch(handlerLong) {
+            val price = launch(handler) {
                 image.join()
                 adapter.notifyItemChanged(position)
                 try {
@@ -111,36 +105,34 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
                     Log.e("ViewModel", "pullHolderData: end of list")
                 }
             }
-            launch(handlerLong) {
+            launch(handler) {
                 price.join()
                 adapter.notifyItemChanged(position)
             }
         }
     }
 
-    fun deleteFavor(favor: StockHolder) = launch(handlerLong) {
-        favorTickerSet.remove(favor.ticker)
+    fun deleteFavor(favor: StockHolder) = launch(handler) {
         repository.deleteFavor(favor.toFavor())
         pullFavors()
     }
 
     fun deleteFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
         val favorJob = deleteFavor(favor)
-        launch(handlerLong) {
+        launch(handler) {
             favorJob.join()
             adapter.notifyItemChanged(position)
         }
     }
 
-    fun saveFavor(favor: StockHolder) = launch(handlerLong) {
-        favorTickerSet.add(favor.ticker)
+    fun saveFavor(favor: StockHolder) = launch(handler) {
         repository.saveFavor(favor.toFavor())
         pullFavors()
     }
 
     fun saveFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
         val favorJob = saveFavor(favor)
-        launch(handlerLong) {
+        launch(handler) {
             favorJob.join()
             adapter.notifyItemChanged(position)
         }
@@ -165,11 +157,11 @@ class StockViewModel(val app: Application) : AndroidViewModel(app), CoroutineSco
         return companies
     }
 
-    fun pullSearchedQueries(count: Int = 30) = launch(handlerLong) {
+    fun pullSearchedQueries(count: Int = 30) = launch(handler) {
         repository.pullSearchedQueries(count)
     }
 
-    fun saveQuery(query: String) = launch(handlerLong) {
+    fun saveQuery(query: String) = launch(handler) {
         if (query != "") {
             repository.saveQuery(query)
             repository.pullSearchedQueries()

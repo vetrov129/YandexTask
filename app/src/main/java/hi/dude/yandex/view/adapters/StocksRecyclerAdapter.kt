@@ -1,21 +1,23 @@
 package hi.dude.yandex.view.adapters
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import hi.dude.yandex.R
+import hi.dude.yandex.view.activities.StockCardActivity
 import hi.dude.yandex.viewmodel.StockHolder
-import hi.dude.yandex.viewmodel.StockViewModel
+import hi.dude.yandex.viewmodel.ListViewModel
 import kotlinx.android.synthetic.main.list_item_stock.view.*
 
 class StocksRecyclerAdapter(
     stocks: List<StockHolder>,
     private val resources: Resources,
     private val context: Context,
-    private val viewModel: StockViewModel,
+    private val viewModel: ListViewModel,
     var starClicked: (Int) -> Unit
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -63,15 +65,13 @@ class StocksRecyclerAdapter(
     }
 
     private fun itemClicked(position: Int) {
-//        val intent = Intent(activity, StockCardActivity::class.java)
-//        intent.putExtra("ticker", stocks[position].ticker)
-//        intent.putExtra("company", stocks[position].company)
-//        intent.putExtra("price", stocks[position].price)
-//        intent.putExtra("change", stocks[position].change)
-//        intent.putExtra("isFavor", stocks[position].isFavor)
-//        intent.putExtra("currency", stocks[position].currency)
-//        intent.putExtra("image", stocks[position].image)
-//        activity.startActivity(intent)
+        val intent = Intent(context, StockCardActivity::class.java)
+        intent.putExtra("ticker", stocks[position].ticker)
+        intent.putExtra("company", stocks[position].company)
+        intent.putExtra("price", stocks[position].price)
+        intent.putExtra("change", stocks[position].change)
+        intent.putExtra("currency", stocks[position].currency)
+        context.startActivity(intent)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

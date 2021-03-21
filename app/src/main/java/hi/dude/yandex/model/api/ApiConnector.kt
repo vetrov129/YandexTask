@@ -3,14 +3,14 @@ package hi.dude.yandex.model.api
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import hi.dude.yandex.model.entities.QueryResult
-import hi.dude.yandex.model.entities.Quote
-import hi.dude.yandex.model.entities.Stock
+import hi.dude.yandex.model.entities.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.net.URL
+import java.time.LocalDate
+import java.time.Period
 
 // this class (and not Retrofit for example) is used to bypass the limit on the number of requests per day
 class ApiConnector {
@@ -142,5 +142,61 @@ class ApiConnector {
         } catch (e: FileNotFoundException) {
             ArrayList()
         }
+    }
+
+    suspend fun getDayChartData(ticker: String): ArrayList<ChartLine> {
+        val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
+        val json = getJson(REQUEST.CHART_DAY, ticker)
+        return gson.fromJson(json, type) ?: ArrayList()
+    }
+
+    suspend fun getWeekChartData(ticker: String): ArrayList<ChartLine> {
+        val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
+        val json = getJson(REQUEST.CHART_WEEK, ticker)
+        return gson.fromJson(json, type) ?: ArrayList()
+    }
+
+    suspend fun getMonthChartData(ticker: String): ArrayList<ChartLine> {
+        val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
+        val json = getJson(REQUEST.CHART_MONTH, ticker)
+        return gson.fromJson(json, type) ?: ArrayList()
+    }
+
+    suspend fun getSixMonthChartData(ticker: String): ArrayList<ChartLine> {
+        val type = object : TypeToken<ArrayList<ChartLine?>?>() {}.type
+        val json = getJson(REQUEST.CHART_SIX_MONTH, ticker)
+        return gson.fromJson(json, type) ?: ArrayList()
+    }
+
+    suspend fun getYearChartData(ticker: String): ArrayList<ChartLine>? {
+        val json = getJson(REQUEST.CHART_YEAR, ticker, fromYear(), toYear())
+        return gson.fromJson(json, Historical::class.java)?.lines
+    }
+
+    suspend fun getAllTimeChartData(ticker: String): ArrayList<ChartLine>? {
+        val json = getJson(REQUEST.CHART_YEAR, ticker)
+        return gson.fromJson(json, Historical::class.java)?.lines
+    }
+
+    private fun fromYear(): Pair<String, String> = Pair("from", (LocalDate.now() - Period.ofYears(1)).toString())
+
+    private fun toYear(): Pair<String, String> = Pair("to", LocalDate.now().toString())
+
+    suspend fun getSummary(ticker: String): Summary {
+        val type = object : TypeToken<ArrayList<Summary?>?>() {}.type
+        val json = getJson(REQUEST.SUMMARY, ticker)
+        return try {
+            (gson.fromJson(json, type) as ArrayList<Summary>)[0]
+        } catch (e: IndexOutOfBoundsException) {
+            Summary("", "", "", "", "", "")
+        } catch (e: NullPointerException) {
+            Summary("", "", "", "", "", "")
+        }
+    }
+
+    suspend fun getNews(ticker: String, limit: Int = 20): ArrayList<NewsItem> {
+        val type = object : TypeToken<ArrayList<NewsItem?>?>() {}.type
+        val json = getJson(REQUEST.NEWS, null, Pair("tickers", ticker), Pair("limit", "$limit"))
+        return gson.fromJson(json, type) ?: ArrayList()
     }
 }
