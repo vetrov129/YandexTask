@@ -30,6 +30,7 @@ class Page(
 
     fun bind(recycler: RecyclerView) {
         this.recycler = recycler
+        this.recycler.itemAnimator?.changeDuration = 0
         recycler.adapter = recAdapter
         setListener()
     }

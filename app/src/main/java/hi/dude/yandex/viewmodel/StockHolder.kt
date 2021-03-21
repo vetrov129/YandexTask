@@ -22,7 +22,7 @@ class StockHolder(
     var image: Bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
     var change = ""
     val currency = currencyOrNull ?: "USD"
-    val company = companyOrNull ?: ""
+    val company = DataFormatter.cutCompany(companyOrNull) ?: ""
     var price = priceOrNull ?: ""
 
     constructor(stock: Stock) : this(
@@ -42,8 +42,6 @@ class StockHolder(
         val array = bos.toByteArray()
         return FavorStock(ticker, company, price, change, array, currency)
     }
-
-//    fun toStock() = Stock(ticker, company, null, currency)
 
     suspend fun pullImage(logMessage: Any? = null) {
         val imageUrl = "https://financialmodelingprep.com/image-stock/$ticker"
@@ -78,7 +76,7 @@ class StockHolder(
                 null
             }
         }
-        val quote = result.await() as Quote?
+        val quote = result.await()
 
         change = DataFormatter.getChange(quote?.open, quote?.close, currency)
         if (quote != null)
