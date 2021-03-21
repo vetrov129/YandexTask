@@ -37,6 +37,7 @@ class StocksListActivity : AppCompatActivity() {
         viewModel = ListViewModel(application)
 
         setDefaultVisibilityOfSearch()
+        viewPager2.visibility = View.GONE
         setUpPager()
         setUpHints()
         setUpSearchPanel()
@@ -157,6 +158,8 @@ class StocksListActivity : AppCompatActivity() {
             viewModel.setFavorHolders(favorsPage)
         }
         viewModel.allStocks.observe(this) {
+            viewPager2.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
             Log.i("ListActivity", "subscribe: allStocks")
             viewModel.pullFavors() // TODO: 20.03.2021 надо постараться вызывать этот метод раньше
             viewModel.addStocks(stocksPage.recAdapter)
