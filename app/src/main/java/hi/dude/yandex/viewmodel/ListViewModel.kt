@@ -62,18 +62,6 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         }
     }
 
-    fun pullFavors() {
-        val favorJob = launch(logHandler) { repository.pullFavors() }
-        launch(logHandler) {
-            favorJob.join()
-            repository.fillFavorSet()
-        }
-    }
-
-    fun checkIsFavor(ticker: String): Boolean {
-        return favorTickerSet.contains(ticker)
-    }
-
     fun addStocks(adapter: RecyclerView.Adapter<*>, start: Int = 0, until: Int = 20) {
         try {
             if (mutableStocks.value == null) {
@@ -118,9 +106,24 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         }
     }
 
-    fun deleteFavor(favor: StockHolder) = launch(logHandler) {
-        repository.deleteFavor(favor.toFavor())
-        pullFavors()
+    fun pullFavors() {
+        val favorJob = launch(logHandler) { repository.pullFavors() }
+        launch(logHandler) {
+            favorJob.join()
+            repository.fillFavorSet()
+        }
+    }
+
+    fun checkIsFavor(ticker: String): Boolean {
+        return favorTickerSet.contains(ticker)
+    }
+
+    fun saveFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
+        val favorJob = saveFavor(favor)
+        launch(logHandler) {
+            favorJob.join()
+            adapter.notifyItemChanged(position)
+        }
     }
 
     fun deleteFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
@@ -133,22 +136,21 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
 
     fun saveFavor(favor: StockHolder) = launch(logHandler) {
         repository.saveFavor(favor.toFavor())
-        pullFavors()
+//        pullFavors()
     }
 
-    fun saveFavor(favor: StockHolder, adapter: RecyclerView.Adapter<*>, position: Int) {
-        val favorJob = saveFavor(favor)
-        launch(logHandler) {
-            favorJob.join()
-            adapter.notifyItemChanged(position)
-        }
+    fun deleteFavor(favor: StockHolder) = launch(logHandler) {
+        repository.deleteFavor(favor.toFavor())
+//        pullFavors()
     }
 
     fun setFavorHolders(page: Page) {
+        Log.i("ViewModel", "setFavorHolders: ")
         val holders = ArrayList<StockHolder>()
         favors.value?.forEach { holders.add(StockHolder(it)) }
         page.stocks = holders
         pullHolderData(0, holders.size, page.recAdapter, holders)
+        page.recAdapter.notifyDataSetChanged()
     }
 
     fun getPopularCompany(count: Int = 20): ArrayList<String> {

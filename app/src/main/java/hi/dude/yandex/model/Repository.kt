@@ -56,12 +56,12 @@ class Repository private constructor() {
         queryDao = daoGetter.getQueryDao()
     }
 
-    fun fillFavorSet() {
-        favors.value?.forEach { favorTickerSet.add(it.ticker) }
-    }
-
     suspend fun pullAllStocks() {
         allStocks.value = connector.getAllStocks()
+    }
+
+    fun fillFavorSet() {
+        favors.value?.forEach { favorTickerSet.add(it.ticker) }
     }
 
     suspend fun pullFavors() = withContext(Dispatchers.IO) {
@@ -69,18 +69,20 @@ class Repository private constructor() {
         withContext(Dispatchers.Main) { favors.value = list }
     }
 
-    suspend fun getQuote(ticker: String): Quote? {
-        return connector.getQuote(ticker)
-    }
-
     suspend fun deleteFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
         favorTickerSet.remove(favor.ticker)
         favorDao.delete(favor)
+        pullFavors()
     }
 
     suspend fun saveFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
         favorTickerSet.add(favor.ticker)
         favorDao.save(favor)
+        pullFavors() // попробовать изменить тип на ArrayList у favors и юзать add/remove
+    }
+
+    suspend fun getQuote(ticker: String): Quote? {
+        return connector.getQuote(ticker)
     }
 
     suspend fun pullSearchedQueries(count: Int = 30) = withContext(Dispatchers.IO) {

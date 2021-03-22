@@ -52,6 +52,7 @@ class StocksListActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.resume()
+        vpAdapter.pageList[viewPager2.currentItem].recAdapter.notifyDataSetChanged()
     }
 
     private fun setDefaultVisibilityOfSearch() {
@@ -141,6 +142,7 @@ class StocksListActivity : AppCompatActivity() {
                 if (viewPager2.currentItem == 0) {
                     stocksPage.recAdapter.notifyDataSetChanged()
                 } else {
+                    Log.i("Activity", "onPageSelected: ")
                     viewModel.setFavorHolders(favorsPage)
                 }
             }
@@ -165,7 +167,7 @@ class StocksListActivity : AppCompatActivity() {
             viewPager2.visibility = View.VISIBLE
             progressBar.visibility = View.GONE
             Log.i("ListActivity", "subscribe: allStocks")
-//            viewModel.pullFavors() // TODO: 20.03.2021 надо постараться вызывать этот метод раньше
+//            viewModel.pullFavors()
             viewModel.addStocks(stocksPage.recAdapter)
 //            viewModel.pullFavors(stocksPage.recAdapter)
             (rvPopularBubbles.adapter as BubblesRecyclerAdapter).bubbles = viewModel.getPopularCompany()

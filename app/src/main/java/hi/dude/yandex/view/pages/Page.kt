@@ -2,6 +2,7 @@ package hi.dude.yandex.view.pages
 
 import android.content.Context
 import android.content.res.Resources
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,7 @@ class Page(
         set(value) {
             field = value
             recAdapter.stocks = value
+            Log.i("Page", "setter: size ${value.size}")
         }
 
     fun bind(recycler: RecyclerView) {
