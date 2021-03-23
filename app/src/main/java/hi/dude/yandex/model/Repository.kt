@@ -4,6 +4,7 @@ import android.app.Application
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.room.Room
 import hi.dude.yandex.model.api.ApiConnector
 import hi.dude.yandex.model.entities.*
@@ -12,6 +13,10 @@ import hi.dude.yandex.model.room.QueryDao
 import hi.dude.yandex.model.room.StockDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 class Repository private constructor() {
 
@@ -33,7 +38,7 @@ class Repository private constructor() {
 
     // list data
     val allStocks: MutableLiveData<ArrayList<Stock>> = MutableLiveData()
-    var favors: MutableLiveData<List<FavorStock>> = MutableLiveData()
+    var favors: MutableLiveData<SortedMap<String, FavorStock>> = MutableLiveData()
     val searchedQueries: MutableLiveData<List<String>> = MutableLiveData()
     val queryResults: MutableLiveData<ArrayList<QueryResult>> = MutableLiveData()
 
@@ -61,24 +66,24 @@ class Repository private constructor() {
     }
 
     fun fillFavorSet() {
-        favors.value?.forEach { favorTickerSet.add(it.ticker) }
+        favors.value?.forEach { favorTickerSet.add(it.value.ticker) }
     }
 
     suspend fun pullFavors() = withContext(Dispatchers.IO) {
         val list = favorDao.getAll()
-        withContext(Dispatchers.Main) { favors.value = list }
+        withContext(Dispatchers.Main) { favors.value = list.map { it.ticker to it }.toMap(HashMap()).toSortedMap() }
     }
 
     suspend fun deleteFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
         favorTickerSet.remove(favor.ticker)
         favorDao.delete(favor)
-        pullFavors()
+        favors.value?.remove(favor.ticker)
     }
 
     suspend fun saveFavor(favor: FavorStock) = withContext(Dispatchers.IO) {
         favorTickerSet.add(favor.ticker)
         favorDao.save(favor)
-        pullFavors() // попробовать изменить тип на ArrayList у favors и юзать add/remove
+        favors.value?.put(favor.ticker, favor)
     }
 
     suspend fun getQuote(ticker: String): Quote? {

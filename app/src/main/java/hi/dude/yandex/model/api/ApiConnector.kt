@@ -68,7 +68,9 @@ class ApiConnector {
 
     private val keys = LinkedList<String>()
 
-    init { keys.addAll(keyArray) }
+    init {
+        keys.addAll(keyArray)
+    }
 
     private val gson = Gson()
 
@@ -77,40 +79,87 @@ class ApiConnector {
         return getJson(request, tickerKey, tokens)
     }
 
-    private suspend fun getJson(request: REQUEST, tickerKey: String?, tokens: Array<out Pair<String, String>?>): String? {
-        while (true) {
-            val url = buildUrl(request, tickerKey, tokens)
-            var json: String?
-            withContext(Dispatchers.Default) {
-                try {
-                    json = tryReadJsonThrice(url)
-                } catch (e: UnknownHostException) {
-                    delay(2500)
-                    json = getJson(request, tickerKey, tokens)
-                }
-            }
+//    private suspend fun getJson(
+//        request: REQUEST,
+//        tickerKey: String?,
+//        tokens: Array<out Pair<String, String>?>
+//    ): String? = withContext(Dispatchers.Default) {
+//        val keysClone: Array<String> = keyArray.clone()     // each endpoint has its own limit on the number of requests
+//        for (key in keysClone) {                            // for example, TOP_STOCKS can work with the first key,
+//            val url = buildUrl(request, tickerKey, key, tokens) // and the QUOTE with the eighth
+////            Log.i(TAG, "getJson: $key ${request.name} tickerKey $tickerKey $url")
+//            val json: String? = try {
+//                URL(url).readText()
+//            }
+//            catch (e: UnknownHostException) { // waiting for the connection to be restored
+//                Log.i(TAG, "getJson: UnknownHostException, waiting for the connection")
+//                delay(2500)
+//                getJson(request, tickerKey, tokens)
+//            } catch (e: FileNotFoundException) { // code 429 Too Many Requests
+//                Log.i(TAG, "getJson: FileNotFoundException, try again")
+//                delay(1000)
+//                getJson(request, tickerKey, tokens)
+//            }
+//            if (json != NEED_UPDATE_KEY_RESPONSE) {
+//                return@withContext json
+//            }
+//        }
+//        Log.e(TAG, "getJson: the keys are out, daily request limit exceeded")
+//        return@withContext null
+//    }
 
-            val currentKey = keys.first
-            if (json == NEED_UPDATE_KEY_RESPONSE) {  // key change if the limit is exceeded
-                keys.remove(currentKey)
-                if (keys.size == 0) {
-                    Log.e(TAG, "updateKey: the keys are out, daily request limit exceeded")
-                    return null
-                }
-                Log.i(TAG, "getJson: key ${keyArray.size - keys.size + 1}/${keyArray.size}")
+
+    private suspend fun getJson(
+        request: REQUEST,
+        tickerKey: String?,
+        tokens: Array<out Pair<String, String>?>
+    ): String? = withContext(Dispatchers.Default) {
+        var currentKey = keys.first
+        while (true) {
+
+            val url = buildUrl(request, tickerKey, currentKey, tokens)
+
+            Log.i(TAG, "getJson: keys number ${21 - keys.size}")
+            Log.i(TAG, "getJson: ${request.name} tickerKey $tickerKey $url")
+
+            val json: String? = try {
+                URL(url).readText()
             }
-            else
-                return json
+            catch (e: UnknownHostException) { // waiting for the connection to be restored
+                Log.i(TAG, "getJson: UnknownHostException, waiting for the connection")
+                delay(2500)
+                getJson(request, tickerKey, tokens)
+            } catch (e: FileNotFoundException) { // code 429 Too Many Requests
+                Log.i(TAG, "getJson: FileNotFoundException, try again")
+                delay(1000)
+                getJson(request, tickerKey, tokens)
+            }
+            if (json == NEED_UPDATE_KEY_RESPONSE) {
+                keys.remove(currentKey)
+                currentKey = keys.first
+                if (keys.size == 0) {
+                    Log.e(TAG, "getJson: the keys are out, daily request limit exceeded")
+                    return@withContext null
+                }
+            } else {
+                return@withContext json
+            }
         }
+        null
     }
 
-    private fun buildUrl(request: REQUEST, tickerKey: String?, tokens: Array<out Pair<String, String>?>): String {
+    private fun buildUrl(
+        request: REQUEST,
+        tickerKey: String?,
+        key: String,
+        tokens: Array<out Pair<String, String>?>
+    ): String {
         var url = "$API_URL${request.text}"
         if (tickerKey != null) url += "$tickerKey?"
         for (token in tokens) {
             url += token?.first + "=" + token?.second + "&"
         }
-        url += "apikey=${keys.first}"
+        url += "apikey=$key"
         return url
     }
 

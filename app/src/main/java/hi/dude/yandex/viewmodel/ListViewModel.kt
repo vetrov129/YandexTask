@@ -13,6 +13,8 @@ import hi.dude.yandex.model.entities.QueryResult
 import hi.dude.yandex.view.pages.Page
 import kotlinx.coroutines.*
 import java.net.UnknownHostException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
 
@@ -42,7 +44,7 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     private val mutableStocks = MutableLiveData<ArrayList<StockHolder>>()
     private val favorTickerSet = repository.favorTickerSet
 
-    val favors: LiveData<List<FavorStock>> = repository.favors
+    val favors: LiveData<SortedMap<String, FavorStock>> = repository.favors
     val stocks: LiveData<ArrayList<StockHolder>> = mutableStocks
     val allStocks: LiveData<ArrayList<Stock>> = repository.allStocks
 
@@ -147,7 +149,7 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     fun setFavorHolders(page: Page) {
         Log.i("ViewModel", "setFavorHolders: ")
         val holders = ArrayList<StockHolder>()
-        favors.value?.forEach { holders.add(StockHolder(it)) }
+        favors.value?.forEach { holders.add(StockHolder(it.value)) }
         page.stocks = holders
         pullHolderData(0, holders.size, page.recAdapter, holders)
         page.recAdapter.notifyDataSetChanged()
