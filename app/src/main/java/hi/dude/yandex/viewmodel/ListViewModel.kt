@@ -175,7 +175,7 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         if (query != "") {
             repository.saveQuery(query)
             repository.pullSearchedQueries()
-        } // TODO: 20.03.2021 возможно нужно ждать окончания первого метода
+        }
     }
 
     fun runSearch(query: String, limit: Int = 4) {

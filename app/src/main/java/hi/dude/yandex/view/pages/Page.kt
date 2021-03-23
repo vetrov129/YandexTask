@@ -27,7 +27,6 @@ class Page(
         set(value) {
             field = value
             recAdapter.stocks = value
-            Log.i("Page", "setter: size ${value.size}")
         }
 
     fun bind(recycler: RecyclerView) {

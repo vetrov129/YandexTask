@@ -16,8 +16,6 @@ import kotlin.math.abs
 class DataFormatter {
 
     companion object {
-        private const val IMAGE_PATH = "https://financialmodelingprep.com/image-stock/"
-
         private val EUR_COUNTRIES = arrayOf(
             "AT", "BE", "DE", "DK", "IT", "IE", "ES", "LU", "NL", "PT",
             "FI", "FR", "GR", "SI", "CY", "MT", "SK", "EE", "LV", "LT"
@@ -56,27 +54,21 @@ class DataFormatter {
             return company.split(Regex("(\\h|\\.)"))[0]
         }
 
-        fun getImageUrl(ticker: String?): String? {
-            return if (ticker == null) null else "$IMAGE_PATH$ticker.jpg"
-        }
-
-        fun stocksToHolders(stocks: LiveData<List<Stock>>): MutableLiveData<ArrayList<StockHolder>> {
-            val holders = MutableLiveData<ArrayList<StockHolder>>()
-            holders.value = ArrayList()
-            if (stocks.value == null) return holders
-            for (stock in stocks.value!!) {
-                holders.value?.add(StockHolder(stock))
-            }
-            return holders
-        }
-
-        private fun deleteOlderThen(array: ArrayList<ChartLine>?, date: LocalDateTime): ArrayList<ChartLine> {
+        fun deleteOlderThen(array: ArrayList<ChartLine>?, date: LocalDateTime): ArrayList<ChartLine> {
             if (array == null) return ArrayList()
             array.removeIf {
                 LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) < date
             }
             return array
         }
+
+        fun previousDay(): LocalDateTime = LocalDateTime.now() - Period.of(0, 0, 1)
+
+        fun previousWeek(): LocalDateTime = LocalDateTime.now() - Period.of(0, 0, 7)
+
+        fun previousMonth(): LocalDateTime = LocalDateTime.now() - Period.of(0, 1, 0)
+
+        fun previousSixMonth(): LocalDateTime = LocalDateTime.now() - Period.of(0, 6, 0)
 
         fun toPrettyDate(date: String?): String {
             if (date == null) return ""

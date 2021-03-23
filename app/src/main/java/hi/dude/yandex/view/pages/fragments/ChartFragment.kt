@@ -154,7 +154,6 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
     private fun setChartData(prices: ArrayList<ChartLine>?) {
         if (prices == null) return
         val values = ArrayList<Entry>()
-        Log.i("ChartFragment", "setChartData: prices.size ${prices.size}")
         var x = 0
         for (i in prices.size - 1 downTo 0) // list of price points has reverse order by date
             values.add(PriceEntry(x++, prices[i]))

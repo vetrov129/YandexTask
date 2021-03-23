@@ -21,7 +21,6 @@ class NewsFragment(val ticker: String, val viewModel: CardViewModel): Fragment()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // TODO: 21.03.2021 а почему здесь не линеар лейаут?
         rvNews.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
         val adapter = NewsRecyclerAdapter(viewModel.news.value ?: ArrayList(), context!!, viewModel)
         rvNews.adapter = adapter

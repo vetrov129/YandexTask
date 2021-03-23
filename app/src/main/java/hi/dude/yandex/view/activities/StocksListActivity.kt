@@ -167,9 +167,7 @@ class StocksListActivity : AppCompatActivity() {
             viewPager2.visibility = View.VISIBLE
             progressBar.visibility = View.GONE
             Log.i("ListActivity", "subscribe: allStocks")
-//            viewModel.pullFavors()
             viewModel.addStocks(stocksPage.recAdapter)
-//            viewModel.pullFavors(stocksPage.recAdapter)
             (rvPopularBubbles.adapter as BubblesRecyclerAdapter).bubbles = viewModel.getPopularCompany()
         }
     }
@@ -247,7 +245,6 @@ class StocksListActivity : AppCompatActivity() {
         edSearch.clearFocus()
         setDefaultVisibilityOfSearch()
         viewModel.clearQueryResults()
-        // pull new favors
     }
 
     private fun searchClearClicked() {

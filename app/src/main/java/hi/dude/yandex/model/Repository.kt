@@ -11,6 +11,7 @@ import hi.dude.yandex.model.entities.*
 import hi.dude.yandex.model.room.DaoGetter
 import hi.dude.yandex.model.room.QueryDao
 import hi.dude.yandex.model.room.StockDao
+import hi.dude.yandex.viewmodel.DataFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -113,22 +114,22 @@ class Repository private constructor() {
     }
 
     suspend fun pullDayChartData(ticker: String) = withContext(Dispatchers.IO) {
-        val list = connector.getDayChartData(ticker)
+        val list = DataFormatter.deleteOlderThen(connector.getDayChartData(ticker), DataFormatter.previousDay())
         withContext(Dispatchers.Main) { dayChart.value = list }
     }
 
     suspend fun pullWeekChartData(ticker: String) = withContext(Dispatchers.IO) {
-        val list = connector.getWeekChartData(ticker)
+        val list = DataFormatter.deleteOlderThen(connector.getWeekChartData(ticker), DataFormatter.previousWeek())
         withContext(Dispatchers.Main) { weekChart.value = list }
     }
 
     suspend fun pullMonthChartData(ticker: String) = withContext(Dispatchers.IO) {
-        val list = connector.getMonthChartData(ticker)
+        val list = DataFormatter.deleteOlderThen(connector.getMonthChartData(ticker), DataFormatter.previousMonth())
         withContext(Dispatchers.Main) { monthChart.value = list }
     }
 
     suspend fun pullSixMonthChartData(ticker: String) = withContext(Dispatchers.IO) {
-        val list = connector.getSixMonthChartData(ticker)
+        val list = DataFormatter.deleteOlderThen(connector.getSixMonthChartData(ticker), DataFormatter.previousSixMonth())
         withContext(Dispatchers.Main) { sixMonthChart.value = list }
     }
 

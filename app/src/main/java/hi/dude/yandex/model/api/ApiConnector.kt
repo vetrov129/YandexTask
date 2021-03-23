@@ -14,6 +14,7 @@ import java.time.LocalDate
 import java.time.Period
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 // this class (and not Retrofit for example) is used to bypass the limit on the number of requests per day
 class ApiConnector {
@@ -79,36 +80,6 @@ class ApiConnector {
         return getJson(request, tickerKey, tokens)
     }
 
-//    private suspend fun getJson(
-//        request: REQUEST,
-//        tickerKey: String?,
-//        tokens: Array<out Pair<String, String>?>
-//    ): String? = withContext(Dispatchers.Default) {
-//        val keysClone: Array<String> = keyArray.clone()     // each endpoint has its own limit on the number of requests
-//        for (key in keysClone) {                            // for example, TOP_STOCKS can work with the first key,
-//            val url = buildUrl(request, tickerKey, key, tokens) // and the QUOTE with the eighth
-////            Log.i(TAG, "getJson: $key ${request.name} tickerKey $tickerKey $url")
-//            val json: String? = try {
-//                URL(url).readText()
-//            }
-//            catch (e: UnknownHostException) { // waiting for the connection to be restored
-//                Log.i(TAG, "getJson: UnknownHostException, waiting for the connection")
-//                delay(2500)
-//                getJson(request, tickerKey, tokens)
-//            } catch (e: FileNotFoundException) { // code 429 Too Many Requests
-//                Log.i(TAG, "getJson: FileNotFoundException, try again")
-//                delay(1000)
-//                getJson(request, tickerKey, tokens)
-//            }
-//            if (json != NEED_UPDATE_KEY_RESPONSE) {
-//                return@withContext json
-//            }
-//        }
-//        Log.e(TAG, "getJson: the keys are out, daily request limit exceeded")
-//        return@withContext null
-//    }
-
-
     private suspend fun getJson(
         request: REQUEST,
         tickerKey: String?,
@@ -116,12 +87,7 @@ class ApiConnector {
     ): String? = withContext(Dispatchers.Default) {
         var currentKey = keys.first
         while (true) {
-
             val url = buildUrl(request, tickerKey, currentKey, tokens)
-
-            Log.i(TAG, "getJson: keys number ${21 - keys.size}")
-            Log.i(TAG, "getJson: ${request.name} tickerKey $tickerKey $url")
-
             val json: String? = try {
                 URL(url).readText()
             }
@@ -136,11 +102,11 @@ class ApiConnector {
             }
             if (json == NEED_UPDATE_KEY_RESPONSE) {
                 keys.remove(currentKey)
-                currentKey = keys.first
                 if (keys.size == 0) {
                     Log.e(TAG, "getJson: the keys are out, daily request limit exceeded")
                     return@withContext null
                 }
+                currentKey = keys.first
             } else {
                 return@withContext json
             }
@@ -161,25 +127,6 @@ class ApiConnector {
         }
         url += "apikey=$key"
         return url
-    }
-
-    private suspend fun tryReadJsonThrice(url: String): String? {  // TODO: 20.03.2021 нужно придумать механизм,
-        return try {                      // чтобы ставить на паузу подгрузку, когда сервак включает защиту от дудоса
-            URL(url).readText()
-        } catch (e: FileNotFoundException) { // code 429 Too Many Requests
-            delay(1000)
-            try {
-                URL(url).readText()
-            } catch (e: FileNotFoundException) {
-                try {
-                    delay(5000)
-                    URL(url).readText()
-                } catch (e: FileNotFoundException) {
-                    Log.e(TAG, "getJson:", e)
-                    null
-                }
-            }
-        }
     }
 
     suspend fun getAllStocks(): ArrayList<Stock> {

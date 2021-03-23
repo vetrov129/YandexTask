@@ -51,7 +51,7 @@ class StockCardActivity : AppCompatActivity() {
         val ticker = intent.getStringExtra("ticker")
         val company = intent.getStringExtra("company")
         val price = intent.getStringExtra("price")
-        val change = intent.getStringExtra("change") // TODO: 21.03.2021 возможно стоит не через интент передавать, а подтягивать, ибо если не прогрузилось, то и здесь не будет
+        val change = intent.getStringExtra("change")
         val currency = intent.getStringExtra("currency")
 
         val holder = StockHolder(ticker!!, company, price, currency)

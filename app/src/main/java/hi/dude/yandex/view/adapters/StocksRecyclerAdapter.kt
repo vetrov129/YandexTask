@@ -26,7 +26,6 @@ class StocksRecyclerAdapter(
         set(value) {
             field = value
             notifyDataSetChanged()
-            Log.i("Adapter", "setter: size ${value.size}")
         }
 
     var countOfPacks = 1
