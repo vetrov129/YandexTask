@@ -12,6 +12,7 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import java.net.SocketException
 
 class PriceListener(
     val ticker: String,
@@ -48,7 +49,7 @@ class PriceListener(
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-        Log.i(TAG, "onFailure: ${response?.isSuccessful}")
+        if (t is SocketException && t.message == "Socket closed") return
         Log.e(TAG, "onFailure: ", t)
     }
 

@@ -219,15 +219,16 @@ class ApiConnector {
         scope: CoroutineScope,
         updatePrice: suspend (WebSocketResponse?) -> Unit
     ) = withContext(Dispatchers.IO) {
-            val client = OkHttpClient.Builder()
-                .build()
-            val request = Request.Builder()
-                .url("wss://ws.finnhub.io?token=c1d746v48v6p64720gqg")
-                .build()
+        val client = OkHttpClient.Builder()
+            .build()
+        val request = Request.Builder()
+            .url("wss://ws.finnhub.io?token=c1d746v48v6p64720gqg")
+            .build()
 
-            val wsListener = PriceListener(ticker, scope, updatePrice)
-            webSocket = client.newWebSocket(request, wsListener)
-        }
+
+        val wsListener = PriceListener(ticker, scope, updatePrice)
+        webSocket = client.newWebSocket(request, wsListener)
+    }
 
     suspend fun closeWebSocket() = withContext(Dispatchers.IO) {
         webSocket.cancel()
