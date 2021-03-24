@@ -60,17 +60,17 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
             if (it != null) {
                 setUpPriceText(
                     DataFormatter.addCurrency(it.price, holder.currency, true),
-                    DataFormatter.getChange(it.price, holder.closePrice, holder.currency)
+                    DataFormatter.getChange(it.price, holder.priceClose, holder.currency)
                 )
                 when {
-                    it.price!! > holder.openPrice!! -> {
+                    it.price!! > holder.priceDouble!! -> {
                         AnimatorInflater.loadAnimator(context, R.animator.grow_price)
                             .apply {
                                 setTarget(tvPriceChart)
                                 start()
                             }
                     }
-                    it.price < holder.openPrice!! -> {
+                    it.price < holder.priceDouble!! -> {
                         AnimatorInflater.loadAnimator(context, R.animator.decrease_price)
                             .apply {
                                 setTarget(tvPriceChart)
@@ -78,9 +78,9 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
                             }
                     }
                 }
-                holder.openPrice = it.price
+                holder.priceDouble = it.price
             }
-            Log.i("ChartFragment", "updateText: price ${it?.price} closePrice ${holder.closePrice}")
+            Log.i("ChartFragment", "updateText: price ${it?.price} closePrice ${holder.priceClose}")
         }
     }
 

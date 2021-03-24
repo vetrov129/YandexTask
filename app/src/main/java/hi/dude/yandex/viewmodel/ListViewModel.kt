@@ -108,6 +108,22 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         }
     }
 
+    fun pullPrices(page: Page) {
+        for (position in page.recAdapter.stocks.indices) {
+            val price = launch(logHandler) {
+                try {
+                    page.stocks[position].pullChangeAndPrice(page.stocks[position].ticker)
+                } catch (e: IndexOutOfBoundsException) {
+                    Log.e("ViewModel", "pullHolderData: end of list")
+                }
+            }
+            launch(logHandler) {
+                price.join()
+                page.recAdapter.notifyItemChanged(position)
+            }
+        }
+    }
+
     fun pullFavors() {
         val favorJob = launch(logHandler) { repository.pullFavors() }
         launch(logHandler) {
@@ -138,12 +154,10 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
 
     fun saveFavor(favor: StockHolder) = launch(logHandler) {
         repository.saveFavor(favor.toFavor())
-//        pullFavors()
     }
 
     fun deleteFavor(favor: StockHolder) = launch(logHandler) {
         repository.deleteFavor(favor.toFavor())
-//        pullFavors()
     }
 
     fun setFavorHolders(page: Page) {

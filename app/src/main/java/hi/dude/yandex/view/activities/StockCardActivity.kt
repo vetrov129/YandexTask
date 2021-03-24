@@ -64,8 +64,8 @@ class StockCardActivity : AppCompatActivity() {
 
         val holder = StockHolder(ticker!!, company, price, currency)
         holder.change = change ?: ""
-        holder.closePrice = closePrice
-        holder.openPrice = openPrice
+        holder.priceClose = closePrice
+        holder.priceDouble = openPrice
         return holder
     }
 

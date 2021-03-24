@@ -5,7 +5,6 @@ import android.util.Log
 import com.squareup.picasso.Picasso
 import hi.dude.yandex.R
 import hi.dude.yandex.model.Repository
-import hi.dude.yandex.model.entities.Quote
 import hi.dude.yandex.model.entities.Stock
 import hi.dude.yandex.model.entities.FavorStock
 import hi.dude.yandex.model.entities.QueryResult
@@ -24,8 +23,8 @@ class StockHolder(
     val currency = currencyOrNull ?: "USD"
     val company = DataFormatter.cutCompany(companyOrNull) ?: ""
     var price = priceOrNull ?: ""
-    var closePrice: Double? = 0.0
-    var openPrice: Double? = 0.0
+    var priceClose: Double? = 0.0
+    var priceDouble: Double? = 0.0
 
     constructor(stock: Stock) : this(
         stock.ticker,
@@ -80,10 +79,10 @@ class StockHolder(
         }
         val quote = result.await()
 
-        change = DataFormatter.getChange(quote?.open, quote?.close, currency)
-        closePrice = quote?.close
-        openPrice = quote?.open
+        change = DataFormatter.getChange(quote?.priceDouble, quote?.close, currency)
+        priceClose = quote?.close
+        priceDouble = quote?.priceDouble
         if (quote != null)
-         price = DataFormatter.addCurrency(quote.open, currency, true)
+         price = DataFormatter.addCurrency(quote.priceDouble, currency, true)
     }
 }

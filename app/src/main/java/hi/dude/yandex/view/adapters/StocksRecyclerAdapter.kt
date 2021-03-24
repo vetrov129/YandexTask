@@ -3,7 +3,6 @@ package hi.dude.yandex.view.adapters
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,8 +71,8 @@ class StocksRecyclerAdapter(
         intent.putExtra("price", stocks[position].price)
         intent.putExtra("change", stocks[position].change)
         intent.putExtra("currency", stocks[position].currency)
-        intent.putExtra("closePrice", stocks[position].closePrice)
-        intent.putExtra("openPrice", stocks[position].openPrice)
+        intent.putExtra("closePrice", stocks[position].priceClose)
+        intent.putExtra("openPrice", stocks[position].priceDouble)
         context.startActivity(intent)
     }
 
