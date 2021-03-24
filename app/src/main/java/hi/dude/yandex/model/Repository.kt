@@ -12,6 +12,7 @@ import hi.dude.yandex.model.room.DaoGetter
 import hi.dude.yandex.model.room.QueryDao
 import hi.dude.yandex.model.room.StockDao
 import hi.dude.yandex.viewmodel.DataFormatter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -52,6 +53,8 @@ class Repository private constructor() {
     val allTimeChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
     val summary: MutableLiveData<Summary> = MutableLiveData()
     val news: MutableLiveData<ArrayList<NewsItem>> = MutableLiveData()
+
+    val realTimePrice: MutableLiveData<PriceData> = MutableLiveData()
 
     suspend fun init(app: Application) = withContext(Dispatchers.IO) {
         val daoGetter = Room.databaseBuilder(app.applicationContext, DaoGetter::class.java, "stocks.sqlite")
@@ -163,6 +166,26 @@ class Repository private constructor() {
 
         summary.value = null
         news.value = ArrayList()
+    }
+
+    suspend fun startUpdatePriceData(ticker: String, scope: CoroutineScope) {
+        val updateAction: suspend (WebSocketResponse?) -> Unit = {
+            withContext(Dispatchers.Main) {
+                if (it != null && it.type == "trade" && it.data != null && it.data.isNotEmpty())
+                    realTimePrice.value = it.data[0]
+                else
+                    Log.i("Repository", "startUpdatePriceData: bad response $it")
+            }
+        }
+        connector.openWebsocket(ticker, scope, updateAction)
+    }
+
+    suspend fun stopUpdatePrice() {
+        connector.closeWebSocket()
+    }
+
+    fun clearRealTimePrice() {
+        realTimePrice.value = null
     }
 }
 

@@ -30,6 +30,7 @@ class StockCardActivity : AppCompatActivity() {
         viewModel.pullChartData(holder.ticker)
         viewModel.pullSummary(holder.ticker)
         viewModel.pullNews(holder.ticker)
+        viewModel.startUpdatePriceData(holder.ticker)
 
         setUpActionBar(holder)
         setUpStar(holder)
@@ -40,6 +41,11 @@ class StockCardActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.cancel()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.stopUpdatePrice()
     }
 
     override fun onResume() {
@@ -53,9 +59,13 @@ class StockCardActivity : AppCompatActivity() {
         val price = intent.getStringExtra("price")
         val change = intent.getStringExtra("change")
         val currency = intent.getStringExtra("currency")
+        val closePrice = intent.getDoubleExtra("closePrice", 0.0)
+        val openPrice = intent.getDoubleExtra("openPrice", 0.0)
 
         val holder = StockHolder(ticker!!, company, price, currency)
         holder.change = change ?: ""
+        holder.closePrice = closePrice
+        holder.openPrice = openPrice
         return holder
     }
 
@@ -100,12 +110,12 @@ class StockCardActivity : AppCompatActivity() {
     }
 
     private fun execAnimation(grow: TextView, decrease: TextView) {
-        AnimatorInflater.loadAnimator(this, R.animator.tab_animation_decrease_small)
+        AnimatorInflater.loadAnimator(this, R.animator.tab_decrease_small)
             .apply {
                 setTarget(decrease)
                 start()
             }
-        AnimatorInflater.loadAnimator(this, R.animator.tab_animation_grow_small)
+        AnimatorInflater.loadAnimator(this, R.animator.tab_grow_small)
             .apply {
                 setTarget(grow)
                 start()

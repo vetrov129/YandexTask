@@ -1,5 +1,6 @@
 package hi.dude.yandex.view.pages.fragments
 
+import android.animation.AnimatorInflater
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -42,9 +43,10 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
 
         setUpBalloon()
         setUpChart()
-        setUpText()
-        setUpPrices()
-        subscribeLists()
+        setUpPriceText(holder.price, holder.change)
+        subscribePrice()
+        setUpChartPrices()
+        subscribeChartLists()
         setChartData(prices[buttonSelected]?.value)
         setUpPeriodButtons()
 
@@ -53,7 +55,36 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
         }
     }
 
-    private fun setUpPrices() {
+    private fun subscribePrice() {
+        viewModel.realTimePrice.observe(this) {
+            if (it != null) {
+                setUpPriceText(
+                    DataFormatter.addCurrency(it.price, holder.currency, true),
+                    DataFormatter.getChange(it.price, holder.closePrice, holder.currency)
+                )
+                when {
+                    it.price!! > holder.openPrice!! -> {
+                        AnimatorInflater.loadAnimator(context, R.animator.grow_price)
+                            .apply {
+                                setTarget(tvPriceChart)
+                                start()
+                            }
+                    }
+                    it.price < holder.openPrice!! -> {
+                        AnimatorInflater.loadAnimator(context, R.animator.decrease_price)
+                            .apply {
+                                setTarget(tvPriceChart)
+                                start()
+                            }
+                    }
+                }
+                holder.openPrice = it.price
+            }
+            Log.i("ChartFragment", "updateText: price ${it?.price} closePrice ${holder.closePrice}")
+        }
+    }
+
+    private fun setUpChartPrices() {
         prices[tvDay] = viewModel.dayChart
         prices[tvWeek] = viewModel.weekChart
         prices[tvMonth] = viewModel.monthChart
@@ -62,7 +93,7 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
         prices[tvAll] = viewModel.allTimeChart
     }
 
-    private fun subscribeLists() {
+    private fun subscribeChartLists() {
         val updateAction: (ArrayList<ChartLine>?) -> Unit = {
             if (prices[buttonSelected]?.value == it) {
                 setChartData(it)
@@ -85,14 +116,14 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
         tvAll.setOnClickListener { v -> periodClicked(v as TextView) }
     }
 
-    private fun setUpText() {
-        tvPriceChart.text = holder.price
-        tvChangeChart.text = holder.change
-        if (holder.change != "" && holder.change[0] == '-')
+    private fun setUpPriceText(price: String, change: String) {
+        tvPriceChart.text = price
+        tvChangeChart.text = change
+        if (change != "" && change[0] == '-')
             tvChangeChart.setTextColor(resources.getColor(R.color.colorRed))
         else
             tvChangeChart.setTextColor(resources.getColor(R.color.colorGreen))
-        buttonBuyFor.text = "${buttonBuyFor.text} ${holder.price}"
+        buttonBuyFor.text = "${resources.getString(R.string.buy_for)} $price"
     }
 
     private fun periodClicked(view: TextView) {

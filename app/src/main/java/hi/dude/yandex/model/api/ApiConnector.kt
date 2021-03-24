@@ -4,9 +4,13 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import hi.dude.yandex.model.entities.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
 import java.io.FileNotFoundException
 import java.net.URL
 import java.net.UnknownHostException
@@ -14,7 +18,6 @@ import java.time.LocalDate
 import java.time.Period
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 // this class (and not Retrofit for example) is used to bypass the limit on the number of requests per day
 class ApiConnector {
@@ -74,6 +77,7 @@ class ApiConnector {
     }
 
     private val gson = Gson()
+    private lateinit var webSocket: WebSocket
 
     @JvmName("getJson1")
     private suspend fun getJson(request: REQUEST, tickerKey: String?, vararg tokens: Pair<String, String>?): String? {
@@ -90,8 +94,7 @@ class ApiConnector {
             val url = buildUrl(request, tickerKey, currentKey, tokens)
             val json: String? = try {
                 URL(url).readText()
-            }
-            catch (e: UnknownHostException) { // waiting for the connection to be restored
+            } catch (e: UnknownHostException) { // waiting for the connection to be restored
                 Log.i(TAG, "getJson: UnknownHostException, waiting for the connection")
                 delay(2500)
                 getJson(request, tickerKey, tokens)
@@ -209,5 +212,24 @@ class ApiConnector {
         val type = object : TypeToken<ArrayList<NewsItem?>?>() {}.type
         val json = getJson(REQUEST.NEWS, null, Pair("tickers", ticker), Pair("limit", "$limit"))
         return gson.fromJson(json, type) ?: ArrayList()
+    }
+
+    suspend fun openWebsocket(
+        ticker: String,
+        scope: CoroutineScope,
+        updatePrice: suspend (WebSocketResponse?) -> Unit
+    ) = withContext(Dispatchers.IO) {
+            val client = OkHttpClient.Builder()
+                .build()
+            val request = Request.Builder()
+                .url("wss://ws.finnhub.io?token=c1d746v48v6p64720gqg")
+                .build()
+
+            val wsListener = PriceListener(ticker, scope, updatePrice)
+            webSocket = client.newWebSocket(request, wsListener)
+        }
+
+    suspend fun closeWebSocket() = withContext(Dispatchers.IO) {
+        webSocket.cancel()
     }
 }

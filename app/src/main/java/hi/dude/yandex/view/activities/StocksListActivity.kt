@@ -180,12 +180,12 @@ class StocksListActivity : AppCompatActivity() {
     }
 
     private fun execAnimation(grow: TextView, decrease: TextView) {
-        AnimatorInflater.loadAnimator(this, R.animator.tab_animation_decrease)
+        AnimatorInflater.loadAnimator(this, R.animator.tab_decrease)
             .apply {
                 setTarget(decrease)
                 start()
             }
-        AnimatorInflater.loadAnimator(this, R.animator.tab_animation_grow)
+        AnimatorInflater.loadAnimator(this, R.animator.tab_grow)
             .apply {
                 setTarget(grow)
                 start()

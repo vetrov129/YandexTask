@@ -24,6 +24,8 @@ class StockHolder(
     val currency = currencyOrNull ?: "USD"
     val company = DataFormatter.cutCompany(companyOrNull) ?: ""
     var price = priceOrNull ?: ""
+    var closePrice: Double? = 0.0
+    var openPrice: Double? = 0.0
 
     constructor(stock: Stock) : this(
         stock.ticker,
@@ -79,6 +81,8 @@ class StockHolder(
         val quote = result.await()
 
         change = DataFormatter.getChange(quote?.open, quote?.close, currency)
+        closePrice = quote?.close
+        openPrice = quote?.open
         if (quote != null)
          price = DataFormatter.addCurrency(quote.open, currency, true)
     }

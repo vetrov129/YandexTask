@@ -4,13 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import hi.dude.yandex.R
 import hi.dude.yandex.model.Repository
-import hi.dude.yandex.model.entities.ChartLine
-import hi.dude.yandex.model.entities.NewsItem
-import hi.dude.yandex.model.entities.Summary
+import hi.dude.yandex.model.entities.*
 import kotlinx.coroutines.*
 import java.io.IOException
 
@@ -36,11 +35,15 @@ class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     val summary: LiveData<Summary> = repository.summary
     val news: LiveData<ArrayList<NewsItem>> = repository.news
 
+    val realTimePrice: LiveData<PriceData> = repository.realTimePrice
+    private lateinit var realTimePriceJob: Job
+
     fun checkIsFavor(ticker: String): Boolean {
         return favorTickerSet.contains(ticker)
     }
 
     fun cancel() {
+        stopUpdatePrice()
         job.cancel()
     }
 
@@ -100,5 +103,28 @@ class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
                 Log.e("ViewModel", "pullNewsImages:", e)
             }
         }
+    }
+
+    fun startUpdatePriceData(ticker: String) {
+        realTimePriceJob = Job(job)
+        val scope = CoroutineScope(Dispatchers.IO) + realTimePriceJob
+        launch(logHandler) {
+            repository.startUpdatePriceData(ticker, scope)
+        }
+    }
+
+    fun stopUpdatePrice() {
+        clearRealTimePrice()
+        val closeJob = launch(logHandler) {
+            repository.stopUpdatePrice()
+        }
+        launch {
+            closeJob.join()
+            realTimePriceJob.cancel()
+        }
+    }
+
+    private fun clearRealTimePrice() {
+        repository.clearRealTimePrice()
     }
 }

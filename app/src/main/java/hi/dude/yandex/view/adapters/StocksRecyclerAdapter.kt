@@ -72,6 +72,8 @@ class StocksRecyclerAdapter(
         intent.putExtra("price", stocks[position].price)
         intent.putExtra("change", stocks[position].change)
         intent.putExtra("currency", stocks[position].currency)
+        intent.putExtra("closePrice", stocks[position].closePrice)
+        intent.putExtra("openPrice", stocks[position].openPrice)
         context.startActivity(intent)
     }
 
