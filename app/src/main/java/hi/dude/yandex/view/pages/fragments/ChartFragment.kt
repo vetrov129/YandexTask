@@ -58,10 +58,14 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
     private fun subscribePrice() {
         viewModel.realTimePrice.observe(this) {
             if (it != null) {
-                setUpPriceText(
-                    DataFormatter.addCurrency(it.price, holder.currency, true),
+                val price = DataFormatter.addCurrency(it.price, holder.currency, true)
+                val change = if (holder.priceClose != 0.0)
                     DataFormatter.getChange(it.price, holder.priceClose, holder.currency)
-                )
+                else {
+                    updateHolder()
+                    ""
+                }
+                setUpPriceText(price, change)
                 when {
                     it.price!! > holder.priceDouble!! -> {
                         AnimatorInflater.loadAnimator(context, R.animator.grow_price)
@@ -82,6 +86,10 @@ class ChartFragment(private val holder: StockHolder, val viewModel: CardViewMode
             }
             Log.i("ChartFragment", "updateText: price ${it?.price} closePrice ${holder.priceClose}")
         }
+    }
+
+    private fun updateHolder() {
+        viewModel.updateHolder(holder)
     }
 
     private fun setUpChartPrices() {

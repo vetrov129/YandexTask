@@ -27,6 +27,10 @@ class ApiConnector {
         const val API_URL = "https://financialmodelingprep.com/api/v3"
 
         val keyArray = arrayOf(
+            "a7a1e8e3e98cfe2b56b8ba42cac81c72",
+            "b0bf65b946c24a87cbd7c605c0bb5239",
+            "de5ebe01a82ca44a72f2a2b4d7bc67f4",
+            "a2d0ac29f91142e018db0e8a586ff6ad",
             "60ee277f0cde9daa7705f6a79b1f47ba",
             "5b19fce62961a4207f6b574e47f242ba",
             "1a08f439ead54166d7afc86b8149839d",
@@ -77,7 +81,6 @@ class ApiConnector {
     }
 
     private val gson = Gson()
-    private lateinit var webSocket: WebSocket
 
     @JvmName("getJson1")
     private suspend fun getJson(request: REQUEST, tickerKey: String?, vararg tokens: Pair<String, String>?): String? {
@@ -105,6 +108,7 @@ class ApiConnector {
             }
             if (json == NEED_UPDATE_KEY_RESPONSE) {
                 keys.remove(currentKey)
+                Log.i(TAG, "getJson: remove $currentKey")
                 if (keys.size == 0) {
                     Log.e(TAG, "getJson: the keys are out, daily request limit exceeded")
                     return@withContext null
@@ -227,10 +231,6 @@ class ApiConnector {
 
 
         val wsListener = PriceListener(ticker, scope, updatePrice)
-        webSocket = client.newWebSocket(request, wsListener)
-    }
-
-    suspend fun closeWebSocket() = withContext(Dispatchers.IO) {
-        webSocket.cancel()
+        client.newWebSocket(request, wsListener)
     }
 }

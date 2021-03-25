@@ -23,14 +23,8 @@ class StockCardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stock_card)
 
-        viewModel = CardViewModel(application)
         val holder = getHolder()
-
-        viewModel.clearCardData()
-        viewModel.pullChartData(holder.ticker)
-        viewModel.pullSummary(holder.ticker)
-        viewModel.pullNews(holder.ticker)
-        viewModel.startUpdatePriceData(holder.ticker)
+        viewModel = CardViewModel(application, holder.ticker)
 
         setUpActionBar(holder)
         setUpStar(holder)
@@ -45,7 +39,7 @@ class StockCardActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.stopUpdatePrice()
+        viewModel.cancel()
     }
 
     override fun onResume() {

@@ -53,9 +53,6 @@ class StocksListActivity : AppCompatActivity() {
         super.onResume()
         viewModel.resume()
         vpAdapter.pageList[viewPager2.currentItem].recAdapter.notifyDataSetChanged()
-        viewModel.pullPrices(vpAdapter.pageList[viewPager2.currentItem])
-        // the price in the list does not match the price on the card
-        // api for the list updates prices less often
     }
 
     private fun setDefaultVisibilityOfSearch() {

@@ -4,10 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import hi.dude.yandex.model.entities.WebSocketResponse
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -38,6 +35,7 @@ class PriceListener(
     override fun onMessage(webSocket: WebSocket?, text: String?) {
         scope.launch(logHandler) { updatePrice(parseMessage(text)) }
         Log.i(TAG, "onMessage: $text")
+        if (!scope.isActive) onClosing(webSocket, NORMAL_CLOSURE_STATUS , null)
     }
 
     override fun onMessage(webSocket: WebSocket?, bytes: ByteString?) {
@@ -45,7 +43,8 @@ class PriceListener(
     }
 
     override fun onClosing(webSocket: WebSocket?, code: Int, reason: String?) {
-        webSocket?.close(NORMAL_CLOSURE_STATUS, null)
+        Log.i(TAG, "onClosing: ")
+        webSocket?.close(code, reason)
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {

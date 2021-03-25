@@ -172,16 +172,12 @@ class Repository private constructor() {
         val updateAction: suspend (WebSocketResponse?) -> Unit = {
             withContext(Dispatchers.Main) {
                 if (it != null && it.type == "trade" && it.data != null && it.data.isNotEmpty())
-                    realTimePrice.value = it.data[0]
+                    realTimePrice.value = it.data.last()
                 else
                     Log.i("Repository", "startUpdatePriceData: bad response $it")
             }
         }
         connector.openWebsocket(ticker, scope, updateAction)
-    }
-
-    suspend fun stopUpdatePrice() {
-        connector.closeWebSocket()
     }
 
     fun clearRealTimePrice() {

@@ -13,7 +13,7 @@ import hi.dude.yandex.model.entities.*
 import kotlinx.coroutines.*
 import java.io.IOException
 
-class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScope {
+class CardViewModel(val app: Application, val ticker: String) : AndroidViewModel(app), CoroutineScope {
 
     private var job = SupervisorJob()
     override var coroutineContext = Dispatchers.Main + job
@@ -38,6 +38,14 @@ class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     val realTimePrice: LiveData<PriceData> = repository.realTimePrice
     private lateinit var realTimePriceJob: Job
 
+    init {
+        clearCardData()
+        pullChartData()
+        pullSummary()
+        pullNews()
+        startUpdatePriceData()
+    }
+
     fun checkIsFavor(ticker: String): Boolean {
         return favorTickerSet.contains(ticker)
     }
@@ -60,25 +68,6 @@ class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
 
     fun saveFavor(favor: StockHolder) = launch(logHandler) {
         repository.saveFavor(favor.toFavor())
-    }
-
-    fun pullChartData(ticker: String) {
-        launch(logHandler) { repository.pullDayChartData(ticker) }
-        launch(logHandler) { repository.pullWeekChartData(ticker) }
-        launch(logHandler) { repository.pullMonthChartData(ticker) }
-        launch(logHandler) { repository.pullSixMonthChartData(ticker) }
-        launch(logHandler) { repository.pullYearChartData(ticker) }
-        launch(logHandler) { repository.pullAllTimeChartData(ticker) }
-    }
-
-    fun clearCardData() = repository.clearCardData()
-
-    fun pullSummary(ticker: String) {
-        launch(logHandler) { repository.pullSummary(ticker) }
-    }
-
-    fun pullNews(ticker: String, limit: Int = 20) {
-        launch(logHandler) { repository.pullNews(ticker, limit) }
     }
 
     fun pullNewsImages(adapter: RecyclerView.Adapter<*>) {
@@ -105,7 +94,34 @@ class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         }
     }
 
-    fun startUpdatePriceData(ticker: String) {
+    fun updateHolder(holder: StockHolder) {
+        val quoteAsync = async { repository.getQuote(holder.ticker) }
+        launch {
+            val quote = quoteAsync.await()
+            holder.priceClose = quote?.close
+        }
+    }
+
+    private fun pullChartData() {
+        launch(logHandler) { repository.pullDayChartData(ticker) }
+        launch(logHandler) { repository.pullWeekChartData(ticker) }
+        launch(logHandler) { repository.pullMonthChartData(ticker) }
+        launch(logHandler) { repository.pullSixMonthChartData(ticker) }
+        launch(logHandler) { repository.pullYearChartData(ticker) }
+        launch(logHandler) { repository.pullAllTimeChartData(ticker) }
+    }
+
+    private fun clearCardData() = repository.clearCardData()
+
+    private fun pullSummary() {
+        launch(logHandler) { repository.pullSummary(ticker) }
+    }
+
+    private fun pullNews(limit: Int = 20) {
+        launch(logHandler) { repository.pullNews(ticker, limit) }
+    }
+
+    private fun startUpdatePriceData() {
         realTimePriceJob = Job(job)
         val scope = CoroutineScope(Dispatchers.IO) + realTimePriceJob
         launch(logHandler) {
@@ -113,15 +129,9 @@ class CardViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         }
     }
 
-    fun stopUpdatePrice() {
+    private fun stopUpdatePrice() {
+        realTimePriceJob.cancel()
         clearRealTimePrice()
-        val closeJob = launch(logHandler) {
-            repository.stopUpdatePrice()
-        }
-        launch {
-            closeJob.join()
-            realTimePriceJob.cancel()
-        }
     }
 
     private fun clearRealTimePrice() {
