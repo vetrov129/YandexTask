@@ -9,12 +9,13 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import java.io.IOException
 import java.net.SocketException
 
 class PriceListener(
-    val ticker: String,
     val scope: CoroutineScope,
-    val updatePrice: suspend (WebSocketResponse?) -> Unit
+    val updatePrice: suspend (WebSocketResponse?) -> Unit,
+    val onWSInitialised: () -> Unit = {}
 ) : WebSocketListener() {
 
     companion object {
@@ -23,19 +24,22 @@ class PriceListener(
     }
 
     private val gson = Gson()
+    private lateinit var webSocket: WebSocket
+
     private val logHandler = CoroutineExceptionHandler { _, exception ->
         println("EXCEPTION/VIEWMODEL: \n${exception.printStackTrace()}}")
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        webSocket.send("{\"type\":\"subscribe\",\"symbol\":\"$ticker\"}")
+        this.webSocket = webSocket
+        onWSInitialised()
         Log.i(TAG, "onOpen: ${response.isSuccessful}")
     }
 
     override fun onMessage(webSocket: WebSocket?, text: String?) {
         scope.launch(logHandler) { updatePrice(parseMessage(text)) }
         Log.i(TAG, "onMessage: $text")
-        if (!scope.isActive) onClosing(webSocket, NORMAL_CLOSURE_STATUS , null)
+        if (!scope.isActive) onClosing(webSocket, NORMAL_CLOSURE_STATUS, null)
     }
 
     override fun onMessage(webSocket: WebSocket?, bytes: ByteString?) {
@@ -54,9 +58,31 @@ class PriceListener(
 
     private fun parseMessage(message: String?): WebSocketResponse? {
         return try {
-            gson.fromJson(message, WebSocketResponse::class.java)
+            val obj = gson.fromJson(message, WebSocketResponse::class.java)
+            Log.i(TAG, "parseMessage: $obj")
+            obj
         } catch (e: JsonParseException) {
             null
+        }
+    }
+
+    fun subscribe(tickers: Array<String>) {
+        tickers.forEach {
+            try {
+                scope.launch(logHandler) { webSocket.send("{\"type\":\"subscribe\",\"symbol\":\"$it\"}") }
+            } catch (e: IOException) {
+                Log.e(TAG, "subscribe: IOException ${e.message}")
+            }
+        }
+    }
+
+    fun unsubscribe(tickers: Array<String>) {
+        tickers.forEach {
+            try {
+                scope.launch(logHandler) { webSocket.send("{\"type\":\"unsubscribe\",\"symbol\":\"$it\"}") }
+            } catch (e: IOException) {
+                Log.e(TAG, "subscribe: IOException ${e.message}")
+            }
         }
     }
 }

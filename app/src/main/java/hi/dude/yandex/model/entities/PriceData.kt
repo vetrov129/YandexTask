@@ -6,4 +6,8 @@ data class PriceData(
     @SerializedName("p") val price: Double?,
     @SerializedName("t") val timestamp: Long?,
     @SerializedName("s") val ticker: String?,
-)
+) {
+    override fun toString(): String {
+        return "p = $price s = $ticker t = $timestamp"
+    }
+}

@@ -10,7 +10,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.WebSocket
 import java.io.FileNotFoundException
 import java.net.URL
 import java.net.UnknownHostException
@@ -81,6 +80,8 @@ class ApiConnector {
     }
 
     private val gson = Gson()
+    private lateinit var listPriceListener: PriceListener
+    private lateinit var cardPriceListener: PriceListener
 
     @JvmName("getJson1")
     private suspend fun getJson(request: REQUEST, tickerKey: String?, vararg tokens: Pair<String, String>?): String? {
@@ -218,19 +219,55 @@ class ApiConnector {
         return gson.fromJson(json, type) ?: ArrayList()
     }
 
-    suspend fun openWebsocket(
-        ticker: String,
+    private suspend fun openWebsocket(
         scope: CoroutineScope,
-        updatePrice: suspend (WebSocketResponse?) -> Unit
-    ) = withContext(Dispatchers.IO) {
+        updatePrice: suspend (WebSocketResponse?) -> Unit,
+        url: String,
+        onWSInitialised: () -> Unit = {}
+    ): PriceListener = withContext(Dispatchers.IO) {
         val client = OkHttpClient.Builder()
             .build()
         val request = Request.Builder()
-            .url("wss://ws.finnhub.io?token=c1d746v48v6p64720gqg")
+            .url(url)
             .build()
 
 
-        val wsListener = PriceListener(ticker, scope, updatePrice)
+        val wsListener = PriceListener(scope, updatePrice, onWSInitialised)
         client.newWebSocket(request, wsListener)
+        wsListener
+    }
+
+    suspend fun openWebsocketForList(
+        scope: CoroutineScope,
+        updatePrice: suspend (WebSocketResponse?) -> Unit,
+        onWSInitialised: () -> Unit
+    ) {
+        listPriceListener =
+            openWebsocket(scope, updatePrice, "wss://ws.finnhub.io?token=c1d746v48v6p64720gqg", onWSInitialised)
+    }
+
+    suspend fun openWebsocketForCard(
+        scope: CoroutineScope,
+        updatePrice: suspend (WebSocketResponse?) -> Unit,
+        onWSInitialised: () -> Unit
+    ) {
+        cardPriceListener =
+            openWebsocket(scope, updatePrice, "wss://ws.finnhub.io?token=c1efm9n48v6pretcrji0", onWSInitialised)
+    }
+
+    fun subscribeForList(tickers: Array<String>) {
+        listPriceListener.subscribe(tickers)
+    }
+
+    fun unsubscribeForList(tickers: Array<String>) {
+        listPriceListener.unsubscribe(tickers)
+    }
+
+    fun subscribeForCard(tickers: Array<String>) {
+        cardPriceListener.subscribe(tickers)
+    }
+
+    fun unsubscribeForCard(tickers: Array<String>) {
+        cardPriceListener.unsubscribe(tickers)
     }
 }

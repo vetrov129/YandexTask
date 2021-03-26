@@ -52,6 +52,11 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
     val queryResults: LiveData<ArrayList<QueryResult>> = repository.queryResults
 
     private var searchJob: Job = Job()
+    private lateinit var realTimePriceJob: Job
+
+    private lateinit var stocksPriceUpdater: PriceUpdater
+    private lateinit var favorPriceUpdater: PriceUpdater
+
 
     fun cancel() {
         job.cancel()
@@ -108,20 +113,31 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         }
     }
 
-    fun pullPrices(page: Page) {
-        for (position in page.recAdapter.stocks.indices) {
-            val price = launch(logHandler) {
-                try {
-                    page.stocks[position].pullChangeAndPrice(page.stocks[position].ticker)
-                } catch (e: IndexOutOfBoundsException) {
-                    Log.e("ViewModel", "pullHolderData: end of list")
-                }
-            }
-            launch(logHandler) {
-                price.join()
-                page.recAdapter.notifyItemChanged(position)
-            }
+    fun openWebSocket() {
+        Log.i("ViewModel", "openWebSocket: ")
+        realTimePriceJob = Job(job)
+        val scope = CoroutineScope(Dispatchers.IO) + realTimePriceJob
+        scope.launch(logHandler) {
+            repository.openWebsocketForList(scope)
         }
+    }
+
+    fun startUpdateStocks(page: Page) {
+        Log.i("ViewModel", "startUpdateStocks: ")
+        if (::favorPriceUpdater.isInitialized) favorPriceUpdater.stop()
+        if (!::stocksPriceUpdater.isInitialized) stocksPriceUpdater = PriceUpdater(page, realTimePriceJob)
+        launch(logHandler) { stocksPriceUpdater.run() }
+    }
+
+    fun startUpdateFavors(page: Page) {
+        Log.i("ViewModel", "startUpdateFavors: ")
+        if (::stocksPriceUpdater.isInitialized) stocksPriceUpdater.stop()
+        if (!::favorPriceUpdater.isInitialized) favorPriceUpdater = PriceUpdater(page, job)
+        launch(logHandler) { favorPriceUpdater.run() }
+    }
+
+    fun closePrices() {
+        realTimePriceJob.cancel()
     }
 
     fun pullFavors() {

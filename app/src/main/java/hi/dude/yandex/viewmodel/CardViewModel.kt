@@ -4,7 +4,6 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import hi.dude.yandex.R
@@ -124,12 +123,20 @@ class CardViewModel(val app: Application, val ticker: String) : AndroidViewModel
     private fun startUpdatePriceData() {
         realTimePriceJob = Job(job)
         val scope = CoroutineScope(Dispatchers.IO) + realTimePriceJob
-        launch(logHandler) {
-            repository.startUpdatePriceData(ticker, scope)
+        val open = launch(logHandler) {
+            repository.startUpdatePriceDataOnCard(ticker, scope)
+            while (repository.waitingForWebSocketForCard) {
+                delay(50)
+            }
+        }
+        launch {
+            open.join()
+            repository.subscribeCard(ticker)
         }
     }
 
     private fun stopUpdatePrice() {
+        repository.waitingForWebSocketForCard = true
         realTimePriceJob.cancel()
         clearRealTimePrice()
     }

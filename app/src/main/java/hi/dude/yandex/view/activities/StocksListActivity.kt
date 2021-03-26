@@ -55,6 +55,11 @@ class StocksListActivity : AppCompatActivity() {
         vpAdapter.pageList[viewPager2.currentItem].recAdapter.notifyDataSetChanged()
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.closePrices()
+    }
+
     private fun setDefaultVisibilityOfSearch() {
         if (progressBar.visibility == View.GONE) {
             viewPager2.visibility = View.VISIBLE
@@ -141,8 +146,10 @@ class StocksListActivity : AppCompatActivity() {
                 changeMenuButtonStyle(viewPager2.currentItem != 0)
                 if (viewPager2.currentItem == 0) {
                     stocksPage.recAdapter.notifyDataSetChanged()
+                    viewModel.startUpdateStocks(stocksPage)
                 } else {
                     viewModel.setFavorHolders(favorsPage)
+                    viewModel.startUpdateFavors(favorsPage)
                 }
             }
         })
@@ -168,6 +175,8 @@ class StocksListActivity : AppCompatActivity() {
             Log.i("ListActivity", "subscribe: allStocks")
             viewModel.addStocks(stocksPage.recAdapter)
             (rvPopularBubbles.adapter as BubblesRecyclerAdapter).bubbles = viewModel.getPopularCompany()
+            viewModel.openWebSocket()
+            viewModel.startUpdateStocks(stocksPage)
         }
     }
 

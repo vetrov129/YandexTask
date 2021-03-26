@@ -14,6 +14,7 @@ import hi.dude.yandex.model.room.StockDao
 import hi.dude.yandex.viewmodel.DataFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
@@ -43,6 +44,10 @@ class Repository private constructor() {
     var favors: MutableLiveData<SortedMap<String, FavorStock>> = MutableLiveData()
     val searchedQueries: MutableLiveData<List<String>> = MutableLiveData()
     val queryResults: MutableLiveData<ArrayList<QueryResult>> = MutableLiveData()
+
+    var waitingForWebSocketForList = true
+    var waitingForWebSocketForCard = true
+    var prices = MutableLiveData<WebSocketResponse>()
 
     // card data
     val dayChart: MutableLiveData<ArrayList<ChartLine>> = MutableLiveData()
@@ -116,6 +121,25 @@ class Repository private constructor() {
         queryResults.value = ArrayList()
     }
 
+    suspend fun openWebsocketForList(scope: CoroutineScope) {
+        val updatePrices: suspend (WebSocketResponse?) -> Unit = {
+            if (it != null)
+                withContext(Dispatchers.Main) { prices.value = it }
+        }
+        val onWSInitialised: () -> Unit = {
+            waitingForWebSocketForList = false
+        }
+        connector.openWebsocketForList(scope, updatePrices, onWSInitialised)
+    }
+
+    fun subscribeForList(tickers: Array<String>) {
+        connector.subscribeForList(tickers)
+    }
+
+    fun unsubscribeForList(tickers: Array<String>) {
+        connector.unsubscribeForList(tickers)
+    }
+
     suspend fun pullDayChartData(ticker: String) = withContext(Dispatchers.IO) {
         val list = DataFormatter.deleteOlderThen(connector.getDayChartData(ticker), DataFormatter.previousDay())
         withContext(Dispatchers.Main) { dayChart.value = list }
@@ -168,7 +192,7 @@ class Repository private constructor() {
         news.value = ArrayList()
     }
 
-    suspend fun startUpdatePriceData(ticker: String, scope: CoroutineScope) {
+    suspend fun startUpdatePriceDataOnCard(ticker: String, scope: CoroutineScope) {
         val updateAction: suspend (WebSocketResponse?) -> Unit = {
             withContext(Dispatchers.Main) {
                 if (it != null && it.type == "trade" && it.data != null && it.data.isNotEmpty())
@@ -177,7 +201,15 @@ class Repository private constructor() {
                     Log.i("Repository", "startUpdatePriceData: bad response $it")
             }
         }
-        connector.openWebsocket(ticker, scope, updateAction)
+
+        val onWSInitialised: () -> Unit = {
+            waitingForWebSocketForCard = false
+        }
+        connector.openWebsocketForCard(scope, updateAction, onWSInitialised)
+    }
+
+    fun subscribeCard(ticker: String) {
+        connector.subscribeForCard(arrayOf(ticker))
     }
 
     fun clearRealTimePrice() {
