@@ -16,7 +16,7 @@ class PriceUpdater(private val page: Page, var job: Job) {
     private var previewsVisibleElements: HashMap<String, StockHolder> = HashMap()
     private var firstVisible = 0
     private var lastVisible = 0
-    private var countOfSubscribed = HashSet<String>()
+    private var subscribed = HashSet<String>()
     private val socketData = repository.prices
 
     private var currentPriceData: HashMap<String, PriceData> = HashMap()
@@ -39,13 +39,13 @@ class PriceUpdater(private val page: Page, var job: Job) {
     private fun subscribeNew() {
         val newTickers = (currentVisibleElements - previewsVisibleElements.keys).keys.toTypedArray()
         repository.subscribeForList(newTickers)
-        countOfSubscribed.addAll(newTickers)
+        subscribed.addAll(newTickers)
     }
 
     private fun unsubscribeOld() {
         val oldTickers = (previewsVisibleElements - currentVisibleElements.keys).keys.toTypedArray()
         repository.unsubscribeForList(oldTickers)
-        countOfSubscribed.removeAll(oldTickers)
+        subscribed.removeAll(oldTickers)
     }
 
     private suspend fun updateSubscribes() {
@@ -54,7 +54,7 @@ class PriceUpdater(private val page: Page, var job: Job) {
         }
         subscribeNew()
         unsubscribeOld()
-        Log.i(TAG, "updateSubscribes: count of subscribed ${countOfSubscribed.size} $countOfSubscribed")
+        Log.i(TAG, "updateSubscribes: count of subscribed ${subscribed.size} $subscribed")
     }
 
     private fun setCurrent(data: List<PriceData?>?) {
@@ -62,11 +62,9 @@ class PriceUpdater(private val page: Page, var job: Job) {
         val map = HashMap<String, PriceData>()
         data.forEach { map[it?.ticker ?: ""] = it ?: PriceData(0.0, 0, "") }
         currentPriceData = map
-        Log.i(TAG, "setCurrent: ${map.size}")
     }
 
     private fun updateCurrentPriceData() {
-        Log.i(TAG, "updateCurrentPriceData: ${socketData.value?.data}")
         setCurrent(socketData.value?.data)
     }
 
@@ -76,10 +74,8 @@ class PriceUpdater(private val page: Page, var job: Job) {
                 delay(200)
                 continue
             }
-            Log.i(TAG, "run: start")
             currentVisibleElements = getVisibleElements()
             updateSubscribes()
-            delay(1500)
             updateCurrentPriceData()
             for (position in firstVisible..lastVisible) {
                 if (currentPriceData.containsKey(page.stocks[position].ticker)) {
@@ -87,10 +83,11 @@ class PriceUpdater(private val page: Page, var job: Job) {
                     page.stocks[position].priceDouble = currentPriceData[page.stocks[position].ticker]?.price
                     page.stocks[position].price = DataFormatter.addCurrency(page.stocks[position].priceDouble, page.stocks[position].currency, true)
                     page.stocks[position].change = DataFormatter.getChange(page.stocks[position].priceDouble, page.stocks[position].priceClose, page.stocks[position].currency)
+                    withContext(Dispatchers.Main) { page.recAdapter.notifyItemChanged(position) }
                 }
             }
-            withContext(Dispatchers.Main) { page.recAdapter.notifyItemRangeChanged(firstVisible, lastVisible) }
             previewsVisibleElements = currentVisibleElements
+            delay(2000)
         }
     }
 

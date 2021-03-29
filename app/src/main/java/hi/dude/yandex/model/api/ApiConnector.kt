@@ -223,7 +223,7 @@ class ApiConnector {
         scope: CoroutineScope,
         updatePrice: suspend (WebSocketResponse?) -> Unit,
         url: String,
-        onWSInitialised: () -> Unit = {}
+        onWSOpen: () -> Unit = {}
     ): PriceListener = withContext(Dispatchers.IO) {
         val client = OkHttpClient.Builder()
             .build()
@@ -232,7 +232,7 @@ class ApiConnector {
             .build()
 
 
-        val wsListener = PriceListener(scope, updatePrice, onWSInitialised)
+        val wsListener = PriceListener(scope, updatePrice, onWSOpen)
         client.newWebSocket(request, wsListener)
         wsListener
     }
@@ -240,19 +240,19 @@ class ApiConnector {
     suspend fun openWebsocketForList(
         scope: CoroutineScope,
         updatePrice: suspend (WebSocketResponse?) -> Unit,
-        onWSInitialised: () -> Unit
+        onWSOpen: () -> Unit
     ) {
         listPriceListener =
-            openWebsocket(scope, updatePrice, "wss://ws.finnhub.io?token=c1d746v48v6p64720gqg", onWSInitialised)
+            openWebsocket(scope, updatePrice, "wss://ws.finnhub.io?token=c1d746v48v6p64720gqg", onWSOpen)
     }
 
     suspend fun openWebsocketForCard(
         scope: CoroutineScope,
         updatePrice: suspend (WebSocketResponse?) -> Unit,
-        onWSInitialised: () -> Unit
+        onWSOpen: () -> Unit
     ) {
         cardPriceListener =
-            openWebsocket(scope, updatePrice, "wss://ws.finnhub.io?token=c1efm9n48v6pretcrji0", onWSInitialised)
+            openWebsocket(scope, updatePrice, "wss://ws.finnhub.io?token=c1efm9n48v6pretcrji0", onWSOpen)
     }
 
     fun subscribeForList(tickers: Array<String>) {
@@ -265,9 +265,5 @@ class ApiConnector {
 
     fun subscribeForCard(tickers: Array<String>) {
         cardPriceListener.subscribe(tickers)
-    }
-
-    fun unsubscribeForCard(tickers: Array<String>) {
-        cardPriceListener.unsubscribe(tickers)
     }
 }

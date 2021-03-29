@@ -13,7 +13,6 @@ import hi.dude.yandex.model.room.StockDao
 import hi.dude.yandex.viewmodel.DataFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
@@ -182,9 +181,6 @@ class Repository private constructor() {
 
     fun clearCardData() {
         dayChart.value = ArrayList()
-        weekChart.value = ArrayList()
-        monthChart.value = ArrayList()
-        sixMonthChart.value = ArrayList()
         yearChart.value = ArrayList()
         allTimeChart.value = ArrayList()
 
@@ -192,7 +188,7 @@ class Repository private constructor() {
         news.value = ArrayList()
     }
 
-    suspend fun startUpdatePriceDataOnCard(ticker: String, scope: CoroutineScope) {
+    suspend fun startUpdatePriceDataOnCard(scope: CoroutineScope) {
         waitingForWebSocketForCard = true
         val updateAction: suspend (WebSocketResponse?) -> Unit = {
             withContext(Dispatchers.Main) {
@@ -203,10 +199,10 @@ class Repository private constructor() {
             }
         }
 
-        val onWSInitialised: () -> Unit = {
+        val onWSOpen: () -> Unit = {
             waitingForWebSocketForCard = false
         }
-        connector.openWebsocketForCard(scope, updateAction, onWSInitialised)
+        connector.openWebsocketForCard(scope, updateAction, onWSOpen)
     }
 
     fun subscribeCard(ticker: String) {

@@ -138,10 +138,6 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
         launch(logHandler) { favorPriceUpdater.run() }
     }
 
-    fun closePrices() {
-        realTimePriceJob.cancel()
-    }
-
     fun pullFavors() {
         val favorJob = launch(logHandler) { repository.pullFavors() }
         launch(logHandler) {

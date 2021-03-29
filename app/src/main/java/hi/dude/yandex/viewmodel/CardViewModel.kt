@@ -124,7 +124,7 @@ class CardViewModel(val app: Application, val ticker: String) : AndroidViewModel
         realTimePriceJob = Job(job)
         val scope = CoroutineScope(Dispatchers.IO) + realTimePriceJob
         val open = launch(logHandler) {
-            repository.startUpdatePriceDataOnCard(ticker, scope)
+            repository.startUpdatePriceDataOnCard(scope)
             while (repository.waitingForWebSocketForCard) {
                 delay(50)
             }
@@ -136,7 +136,6 @@ class CardViewModel(val app: Application, val ticker: String) : AndroidViewModel
     }
 
     private fun stopUpdatePrice() {
-        repository.waitingForWebSocketForCard = true // TODO: 29.03.2021 скорее всего эту строку можно убрать
         realTimePriceJob.cancel()
         clearRealTimePrice()
     }

@@ -15,7 +15,7 @@ import java.net.SocketException
 class PriceListener(
     val scope: CoroutineScope,
     val updatePrice: suspend (WebSocketResponse?) -> Unit,
-    val onWSInitialised: () -> Unit = {}
+    val onWSOpen: () -> Unit = {}
 ) : WebSocketListener() {
 
     companion object {
@@ -32,14 +32,14 @@ class PriceListener(
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         this.webSocket = webSocket
-        onWSInitialised()
+        onWSOpen()
         Log.i(TAG, "onOpen: ${response.isSuccessful}")
     }
 
     override fun onMessage(webSocket: WebSocket?, text: String?) {
         scope.launch(logHandler) { updatePrice(parseMessage(text)) }
-        Log.i(TAG, "onMessage: $text")
-        if (!scope.isActive) onClosing(webSocket, NORMAL_CLOSURE_STATUS, null)
+//        Log.i(TAG, "onMessage: $text")
+//        if (!scope.isActive) onClosing(webSocket, NORMAL_CLOSURE_STATUS, null)
     }
 
     override fun onMessage(webSocket: WebSocket?, bytes: ByteString?) {
@@ -59,7 +59,7 @@ class PriceListener(
     private fun parseMessage(message: String?): WebSocketResponse? {
         return try {
             val obj = gson.fromJson(message, WebSocketResponse::class.java)
-            Log.i(TAG, "parseMessage: $obj")
+//            Log.i(TAG, "parseMessage: $obj")
             obj
         } catch (e: JsonParseException) {
             null
