@@ -136,7 +136,7 @@ class CardViewModel(val app: Application, val ticker: String) : AndroidViewModel
     }
 
     private fun stopUpdatePrice() {
-        repository.waitingForWebSocketForCard = true
+        repository.waitingForWebSocketForCard = true // TODO: 29.03.2021 скорее всего эту строку можно убрать
         realTimePriceJob.cancel()
         clearRealTimePrice()
     }

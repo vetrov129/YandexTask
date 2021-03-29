@@ -7,7 +7,7 @@ import hi.dude.yandex.model.entities.PriceData
 import hi.dude.yandex.view.pages.Page
 import kotlinx.coroutines.*
 
-class PriceUpdater(private val page: Page, val job: Job) {
+class PriceUpdater(private val page: Page, var job: Job) {
 
     val TAG = "PriceUpdater"
 
@@ -71,7 +71,11 @@ class PriceUpdater(private val page: Page, val job: Job) {
     }
 
     suspend fun run() = withContext(Dispatchers.Default) {
-        while (isActive && job.isActive) {
+        while (isActive) {
+            if (job.isCancelled) {
+                delay(200)
+                continue
+            }
             Log.i(TAG, "run: start")
             currentVisibleElements = getVisibleElements()
             updateSubscribes()
@@ -83,7 +87,6 @@ class PriceUpdater(private val page: Page, val job: Job) {
                     page.stocks[position].priceDouble = currentPriceData[page.stocks[position].ticker]?.price
                     page.stocks[position].price = DataFormatter.addCurrency(page.stocks[position].priceDouble, page.stocks[position].currency, true)
                     page.stocks[position].change = DataFormatter.getChange(page.stocks[position].priceDouble, page.stocks[position].priceClose, page.stocks[position].currency)
-                    // TODO: 26.03.2021 обновлять предыдущую цену
                 }
             }
             withContext(Dispatchers.Main) { page.recAdapter.notifyItemRangeChanged(firstVisible, lastVisible) }

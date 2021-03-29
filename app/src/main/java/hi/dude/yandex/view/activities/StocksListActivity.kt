@@ -55,10 +55,6 @@ class StocksListActivity : AppCompatActivity() {
         vpAdapter.pageList[viewPager2.currentItem].recAdapter.notifyDataSetChanged()
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.closePrices()
-    }
 
     private fun setDefaultVisibilityOfSearch() {
         if (progressBar.visibility == View.GONE) {

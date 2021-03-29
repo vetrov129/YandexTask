@@ -4,7 +4,6 @@ import android.app.Application
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.room.Room
 import hi.dude.yandex.model.api.ApiConnector
 import hi.dude.yandex.model.entities.*
@@ -122,6 +121,7 @@ class Repository private constructor() {
     }
 
     suspend fun openWebsocketForList(scope: CoroutineScope) {
+        waitingForWebSocketForList = true
         val updatePrices: suspend (WebSocketResponse?) -> Unit = {
             if (it != null)
                 withContext(Dispatchers.Main) { prices.value = it }
@@ -193,6 +193,7 @@ class Repository private constructor() {
     }
 
     suspend fun startUpdatePriceDataOnCard(ticker: String, scope: CoroutineScope) {
+        waitingForWebSocketForCard = true
         val updateAction: suspend (WebSocketResponse?) -> Unit = {
             withContext(Dispatchers.Main) {
                 if (it != null && it.type == "trade" && it.data != null && it.data.isNotEmpty())

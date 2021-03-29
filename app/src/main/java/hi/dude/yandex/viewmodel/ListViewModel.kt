@@ -67,6 +67,9 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
             job = SupervisorJob()
             coroutineContext = Dispatchers.Main + job
         }
+        realTimePriceJob = Job(job)
+        if (::stocksPriceUpdater.isInitialized) stocksPriceUpdater.job = realTimePriceJob
+        if (::favorPriceUpdater.isInitialized) favorPriceUpdater.job = realTimePriceJob
     }
 
     fun addStocks(adapter: RecyclerView.Adapter<*>, start: Int = 0, until: Int = 20) {
@@ -115,7 +118,6 @@ class ListViewModel(val app: Application) : AndroidViewModel(app), CoroutineScop
 
     fun openWebSocket() {
         Log.i("ViewModel", "openWebSocket: ")
-        realTimePriceJob = Job(job)
         val scope = CoroutineScope(Dispatchers.IO) + realTimePriceJob
         scope.launch(logHandler) {
             repository.openWebsocketForList(scope)
