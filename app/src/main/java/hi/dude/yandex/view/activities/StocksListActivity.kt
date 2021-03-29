@@ -57,6 +57,7 @@ class StocksListActivity : AppCompatActivity() {
 
 
     private fun setDefaultVisibilityOfSearch() {
+        // while progress bar is visible, data isn't received
         if (progressBar.visibility == View.GONE) {
             viewPager2.visibility = View.VISIBLE
         }

@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import hi.dude.yandex.fragments.NewsFragment
+import hi.dude.yandex.view.pages.fragments.NewsFragment
 import hi.dude.yandex.view.pages.fragments.SummaryFragment
 import hi.dude.yandex.view.pages.fragments.ChartFragment
 import hi.dude.yandex.viewmodel.CardViewModel

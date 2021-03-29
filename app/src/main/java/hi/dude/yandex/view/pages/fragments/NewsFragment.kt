@@ -1,4 +1,4 @@
-package hi.dude.yandex.fragments
+package hi.dude.yandex.view.pages.fragments
 
 import android.app.Activity
 import android.os.Bundle

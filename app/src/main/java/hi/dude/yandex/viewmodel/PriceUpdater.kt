@@ -81,8 +81,16 @@ class PriceUpdater(private val page: Page, var job: Job) {
                 if (currentPriceData.containsKey(page.stocks[position].ticker)) {
                     Log.i(TAG, "run: cycle, set holder ${page.stocks[position].ticker} price")
                     page.stocks[position].priceDouble = currentPriceData[page.stocks[position].ticker]?.price
-                    page.stocks[position].price = DataFormatter.addCurrency(page.stocks[position].priceDouble, page.stocks[position].currency, true)
-                    page.stocks[position].change = DataFormatter.getChange(page.stocks[position].priceDouble, page.stocks[position].priceClose, page.stocks[position].currency)
+                    page.stocks[position].price = DataFormatter.addCurrency(
+                        page.stocks[position].priceDouble,
+                        page.stocks[position].currency,
+                        true
+                    )
+                    page.stocks[position].change = DataFormatter.getChange(
+                        page.stocks[position].priceDouble,
+                        page.stocks[position].priceClose,
+                        page.stocks[position].currency
+                    )
                     withContext(Dispatchers.Main) { page.recAdapter.notifyItemChanged(position) }
                 }
             }

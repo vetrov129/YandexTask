@@ -146,6 +146,7 @@ class ApiConnector {
     suspend fun getQuote(ticker: String?): Quote? {
         val type = object : TypeToken<ArrayList<Quote?>?>() {}.type
         val json = getJson(REQUEST.QUOTE, ticker)
+        // json response contains list, need to only first object
         return try {
             (gson.fromJson(json, type) as ArrayList<Quote>)[0]
         } catch (e: IndexOutOfBoundsException) {
@@ -204,6 +205,7 @@ class ApiConnector {
     suspend fun getSummary(ticker: String): Summary? {
         val type = object : TypeToken<ArrayList<Summary?>?>() {}.type
         val json = getJson(REQUEST.SUMMARY, ticker)
+        // json response contains list, need to only first object
         return try {
             (gson.fromJson(json, type) as ArrayList<Summary>)[0]
         } catch (e: IndexOutOfBoundsException) {

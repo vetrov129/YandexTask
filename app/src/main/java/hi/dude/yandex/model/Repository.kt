@@ -125,10 +125,10 @@ class Repository private constructor() {
             if (it != null)
                 withContext(Dispatchers.Main) { prices.value = it }
         }
-        val onWSInitialised: () -> Unit = {
+        val onWSOpen: () -> Unit = {
             waitingForWebSocketForList = false
         }
-        connector.openWebsocketForList(scope, updatePrices, onWSInitialised)
+        connector.openWebsocketForList(scope, updatePrices, onWSOpen)
     }
 
     fun subscribeForList(tickers: Array<String>) {
