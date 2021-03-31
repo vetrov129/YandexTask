@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 /.idea/*.xml
+/app/src/main/java/hi/dude/yandex/todo.txt

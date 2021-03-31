@@ -2,6 +2,7 @@ package hi.dude.yandex.viewmodel
 
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import hi.dude.yandex.model.Repository
 import hi.dude.yandex.model.entities.PriceData
 import hi.dude.yandex.view.pages.Page
@@ -23,6 +24,22 @@ class PriceUpdater(private val page: Page, var job: Job) {
 
     private var isActive = true
 
+    private val delayed = HashSet<Int>()
+    private var recyclerIsReadyUpdate = true
+        set(value) {
+            field = value
+            if (value) CoroutineScope(Dispatchers.Main).launch { updateRecycler() }
+        }
+
+    init {
+        page.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                recyclerIsReadyUpdate = newState == RecyclerView.SCROLL_STATE_IDLE
+            }
+        })
+    }
+
     private fun getVisibleElements(): HashMap<String, StockHolder> {
         val manager = page.recycler.layoutManager as LinearLayoutManager
         firstVisible = manager.findFirstVisibleItemPosition()
@@ -31,9 +48,7 @@ class PriceUpdater(private val page: Page, var job: Job) {
         lastVisible = manager.findLastVisibleItemPosition()
         if (lastVisible + 5 < page.stocks.size) lastVisible += 5
 
-        val result = page.stocks.subList(firstVisible, lastVisible).map { it.ticker to it }.toMap(HashMap())
-        Log.i(TAG, "getVisibleElements: ${result.size}")
-        return result
+        return page.stocks.subList(firstVisible, lastVisible).map { it.ticker to it }.toMap(HashMap())
     }
 
     private fun subscribeNew() {
@@ -79,7 +94,6 @@ class PriceUpdater(private val page: Page, var job: Job) {
             updateCurrentPriceData()
             for (position in firstVisible..lastVisible) {
                 if (currentPriceData.containsKey(page.stocks[position].ticker)) {
-                    Log.i(TAG, "run: cycle, set holder ${page.stocks[position].ticker} price")
                     page.stocks[position].priceDouble = currentPriceData[page.stocks[position].ticker]?.price
                     page.stocks[position].price = DataFormatter.addCurrency(
                         page.stocks[position].priceDouble,
@@ -91,12 +105,18 @@ class PriceUpdater(private val page: Page, var job: Job) {
                         page.stocks[position].priceClose,
                         page.stocks[position].currency
                     )
-                    withContext(Dispatchers.Main) { page.recAdapter.notifyItemChanged(position) }
+                    delayed.add(position)
                 }
             }
             previewsVisibleElements = currentVisibleElements
+            if (recyclerIsReadyUpdate) updateRecycler()
             delay(2000)
         }
+    }
+
+    private suspend fun updateRecycler() = withContext(Dispatchers.Main) {
+        delayed.forEach{ page.recAdapter.notifyItemChanged(it) }
+        delayed.clear()
     }
 
     fun stop() {

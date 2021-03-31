@@ -246,6 +246,8 @@ class StocksListActivity : AppCompatActivity() {
 
         viewModel.saveQuery(edSearch.text.toString())
         viewModel.clearQueryResults()
+        // if added in favorite on the result panel
+        viewModel.setFavorHolders(favorsPage)
         edSearch.text = "".toEditable()
         edSearch.clearFocus()
         setDefaultVisibilityOfSearch()
