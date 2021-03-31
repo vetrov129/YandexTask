@@ -12,20 +12,15 @@ class PriceUpdater(private val page: Page, var job: Job) {
 
     val TAG = "PriceUpdater"
 
+    private var isActive = true
     private val repository = Repository.getInstance()
-    private var currentVisibleElements: HashMap<String, StockHolder> = HashMap()
-    private var previewsVisibleElements: HashMap<String, StockHolder> = HashMap()
     private var firstVisible = 0
     private var lastVisible = 0
     private var subscribed = HashSet<String>()
     private val socketData = repository.prices
-
     private var currentPriceData: HashMap<String, PriceData> = HashMap()
-
-    private var isActive = true
-
-    private val delayed = HashSet<Int>()
-    private var recyclerIsReadyUpdate = true
+    private val delayed = HashSet<Int>() // items to be updated
+    private var recyclerIsReadyUpdate = true // cannot be updated while scrolling
         set(value) {
             field = value
             if (value) CoroutineScope(Dispatchers.Main).launch { updateRecycler() }
@@ -40,59 +35,55 @@ class PriceUpdater(private val page: Page, var job: Job) {
         })
     }
 
-    private fun getVisibleElements(): HashMap<String, StockHolder> {
-        val manager = page.recycler.layoutManager as LinearLayoutManager
-        firstVisible = manager.findFirstVisibleItemPosition()
-        if (firstVisible >= 5) firstVisible -= 5
+    private fun setVisibleIndexes() {
+        try {
+            val manager = page.recycler.layoutManager as LinearLayoutManager
+            firstVisible = manager.findFirstVisibleItemPosition()
+            if (firstVisible >= 5) firstVisible -= 5
 
-        lastVisible = manager.findLastVisibleItemPosition()
-        if (lastVisible + 5 < page.stocks.size) lastVisible += 5
-
-        return page.stocks.subList(firstVisible, lastVisible).map { it.ticker to it }.toMap(HashMap())
-    }
-
-    private fun subscribeNew() {
-        val newTickers = (currentVisibleElements - previewsVisibleElements.keys).keys.toTypedArray()
-        repository.subscribeForList(newTickers)
-        subscribed.addAll(newTickers)
-    }
-
-    private fun unsubscribeOld() {
-        val oldTickers = (previewsVisibleElements - currentVisibleElements.keys).keys.toTypedArray()
-        repository.unsubscribeForList(oldTickers)
-        subscribed.removeAll(oldTickers)
+            lastVisible = manager.findLastVisibleItemPosition()
+            if (lastVisible + 5 < page.stocks.size) lastVisible += 5
+        } catch (e: NullPointerException) {
+            Log.e(TAG, "setVisibleIndexes: ", e)
+        }
     }
 
     private suspend fun updateSubscribes() {
         while (repository.waitingForWebSocketForList) {
             delay(100)
         }
-        subscribeNew()
-        unsubscribeOld()
-        Log.i(TAG, "updateSubscribes: count of subscribed ${subscribed.size} $subscribed")
-    }
-
-    private fun setCurrent(data: List<PriceData?>?) {
-        if (data == null) return
-        val map = HashMap<String, PriceData>()
-        data.forEach { map[it?.ticker ?: ""] = it ?: PriceData(0.0, 0, "") }
-        currentPriceData = map
-    }
-
-    private fun updateCurrentPriceData() {
-        setCurrent(socketData.value?.data)
-    }
-
-    suspend fun run() = withContext(Dispatchers.Default) {
-        while (isActive) {
-            if (job.isCancelled) {
-                delay(200)
-                continue
+        setVisibleIndexes()
+        val newSubscribed = HashSet<String>()
+        // subscribe for new tickers
+        for (position in firstVisible..lastVisible) {
+            try {
+                if (!subscribed.contains(page.stocks[position].ticker)) {
+                    repository.subscribeForList(arrayOf(page.stocks[position].ticker))
+                }
+                newSubscribed.add(page.stocks[position].ticker)
+            } catch (e: IndexOutOfBoundsException) {
+                Log.e(TAG, "updateSubscribes: end of list")
+                break
             }
-            currentVisibleElements = getVisibleElements()
-            updateSubscribes()
-            updateCurrentPriceData()
-            for (position in firstVisible..lastVisible) {
+        }
+        // unsubscribe for old tickers
+        repository.unsubscribeForList((subscribed - newSubscribed).toTypedArray())
+
+        subscribed = newSubscribed
+        Log.i(TAG, "updateSubscribes: subscribed ${subscribed.size} $subscribed")
+    }
+
+    private fun updateCurrentPriceData() = synchronized(socketData.value?.data!!) {
+        if (socketData.value?.data == null) return
+        val map = HashMap<String, PriceData>()
+        socketData.value?.data?.forEach { map[it?.ticker ?: ""] = it ?: PriceData(0.0, 0, "") }
+        currentPriceData = map
+        socketData.value?.data = ArrayList()
+    }
+
+    private fun updateHoldersData() {
+        for (position in firstVisible..lastVisible) {
+            try {
                 if (currentPriceData.containsKey(page.stocks[position].ticker)) {
                     page.stocks[position].priceDouble = currentPriceData[page.stocks[position].ticker]?.price
                     page.stocks[position].price = DataFormatter.addCurrency(
@@ -107,10 +98,25 @@ class PriceUpdater(private val page: Page, var job: Job) {
                     )
                     delayed.add(position)
                 }
+            } catch (e: IndexOutOfBoundsException) {
+                Log.e(TAG, "run: end of list")
+                break
             }
-            previewsVisibleElements = currentVisibleElements
+
+        }
+    }
+
+    suspend fun run() = withContext(Dispatchers.Default) {
+        while (isActive) {
+            if (job.isCancelled) {
+                delay(200)
+                continue
+            }
+            updateSubscribes()
+            updateCurrentPriceData()
+            updateHoldersData()
             if (recyclerIsReadyUpdate) updateRecycler()
-            delay(2000)
+//            delay(2000)
         }
     }
 

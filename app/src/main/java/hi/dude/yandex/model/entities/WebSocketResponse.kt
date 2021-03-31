@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class WebSocketResponse(
     @SerializedName("type") val type: String?,
-    @SerializedName("data") val data: List<PriceData?>?,
+    @SerializedName("data") var data: ArrayList<PriceData?>?,
 ) {
     override fun toString(): String {
         return "type = $type data = $data"

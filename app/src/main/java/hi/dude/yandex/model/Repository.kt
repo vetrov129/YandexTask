@@ -120,10 +120,13 @@ class Repository private constructor() {
     }
 
     suspend fun openWebsocketForList(scope: CoroutineScope) {
+        withContext(Dispatchers.Main) { prices.value = WebSocketResponse("trade", ArrayList()) }
         waitingForWebSocketForList = true
         val updatePrices: suspend (WebSocketResponse?) -> Unit = {
-            if (it != null)
-                withContext(Dispatchers.Main) { prices.value = it }
+            synchronized(prices.value?.data!!) {
+                if (it?.data != null && it.type == "trade")
+                    prices.value?.data?.addAll(it.data!!)
+            }
         }
         val onWSOpen: () -> Unit = {
             waitingForWebSocketForList = false
@@ -192,8 +195,8 @@ class Repository private constructor() {
         waitingForWebSocketForCard = true
         val updateAction: suspend (WebSocketResponse?) -> Unit = {
             withContext(Dispatchers.Main) {
-                if (it != null && it.type == "trade" && it.data != null && it.data.isNotEmpty())
-                    realTimePrice.value = it.data.last()
+                if (it != null && it.type == "trade" && it.data != null && it.data!!.isNotEmpty())
+                    realTimePrice.value = it.data!!.last()
                 else
                     Log.i("Repository", "startUpdatePriceData: bad response $it")
             }
