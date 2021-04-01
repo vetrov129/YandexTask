@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         startActivity(Intent(this, StocksListActivity::class.java))
         finish()
     }

@@ -257,15 +257,10 @@ class ApiConnector {
             openWebsocket(scope, updatePrice, "wss://ws.finnhub.io?token=c1efm9n48v6pretcrji0", onWSOpen)
     }
 
-    fun subscribeForList(tickers: Array<String>) {
-        listPriceListener.subscribe(tickers)
-    }
+    fun subscribeForList(tickers: Array<String>) = listPriceListener.subscribe(tickers)
 
-    fun unsubscribeForList(tickers: Array<String>) {
-        listPriceListener.unsubscribe(tickers)
-    }
+    fun unsubscribeForList(tickers: Array<String>) = listPriceListener.unsubscribe(tickers)
 
-    fun subscribeForCard(tickers: Array<String>) {
-        cardPriceListener.subscribe(tickers)
-    }
+    fun subscribeForCard(tickers: Array<String>) = cardPriceListener.subscribe(tickers)
+
 }

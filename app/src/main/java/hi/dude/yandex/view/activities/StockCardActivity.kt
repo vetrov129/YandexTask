@@ -32,11 +32,6 @@ class StockCardActivity : AppCompatActivity() {
         setUpTabs()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.cancel()
-    }
-
     override fun onPause() {
         super.onPause()
         viewModel.cancel()

@@ -93,9 +93,7 @@ class Repository private constructor() {
         favors.value?.put(favor.ticker, favor)
     }
 
-    suspend fun getQuote(ticker: String): Quote? {
-        return connector.getQuote(ticker)
-    }
+    suspend fun getQuote(ticker: String): Quote? = connector.getQuote(ticker)
 
     suspend fun pullSearchedQueries(count: Int = 30) = withContext(Dispatchers.IO) {
         val list = queryDao.getStrings(count)
@@ -134,13 +132,9 @@ class Repository private constructor() {
         connector.openWebsocketForList(scope, updatePrices, onWSOpen)
     }
 
-    fun subscribeForList(tickers: Array<String>) {
-        connector.subscribeForList(tickers)
-    }
+    fun subscribeForList(tickers: Array<String>) = connector.subscribeForList(tickers)
 
-    fun unsubscribeForList(tickers: Array<String>) {
-        connector.unsubscribeForList(tickers)
-    }
+    fun unsubscribeForList(tickers: Array<String>) = connector.unsubscribeForList(tickers)
 
     suspend fun pullDayChartData(ticker: String) = withContext(Dispatchers.IO) {
         val list = DataFormatter.deleteOlderThen(connector.getDayChartData(ticker), DataFormatter.previousDay())
@@ -208,9 +202,8 @@ class Repository private constructor() {
         connector.openWebsocketForCard(scope, updateAction, onWSOpen)
     }
 
-    fun subscribeCard(ticker: String) {
-        connector.subscribeForCard(arrayOf(ticker))
-    }
+    fun subscribeCard(ticker: String) = connector.subscribeForCard(arrayOf(ticker))
+
 
     fun clearRealTimePrice() {
         realTimePrice.value = null
