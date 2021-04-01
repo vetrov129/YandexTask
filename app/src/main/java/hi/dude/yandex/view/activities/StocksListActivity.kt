@@ -3,12 +3,15 @@ package hi.dude.yandex.view.activities
 import android.animation.AnimatorInflater
 import android.content.Context
 import android.os.Bundle
+import android.os.Process
+import android.os.Process.myPid
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
@@ -55,6 +58,19 @@ class StocksListActivity : AppCompatActivity() {
         vpAdapter.pageList[viewPager2.currentItem].recAdapter.notifyDataSetChanged()
     }
 
+    override fun onBackPressed() {
+        AlertDialog.Builder(this).apply {
+            setTitle("Exit?")
+            setMessage("Press exit to close application")
+            setCancelable(false)
+            setPositiveButton("Exit") { _, _ ->
+                finishAndRemoveTask()
+                Process.killProcess(myPid())
+            }
+            setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+            create().show()
+        }
+    }
 
     private fun setDefaultVisibilityOfSearch() {
         // while progress bar is visible, data isn't received

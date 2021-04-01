@@ -70,7 +70,6 @@ class PriceUpdater(private val page: Page, var job: Job) {
         repository.unsubscribeForList((subscribed - newSubscribed).toTypedArray())
 
         subscribed = newSubscribed
-        Log.i(TAG, "updateSubscribes: subscribed ${subscribed.size} $subscribed")
     }
 
     private fun updateCurrentPriceData() = synchronized(socketData.value?.data!!) {
@@ -116,7 +115,7 @@ class PriceUpdater(private val page: Page, var job: Job) {
             updateCurrentPriceData()
             updateHoldersData()
             if (recyclerIsReadyUpdate) updateRecycler()
-//            delay(2000)
+            delay(1000)
         }
     }
 
