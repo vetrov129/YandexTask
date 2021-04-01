@@ -8,6 +8,7 @@ import android.os.Process.myPid
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -232,6 +233,12 @@ class StocksListActivity : AppCompatActivity() {
 
             override fun afterTextChanged(p0: Editable?) {}
         })
+        edSearch.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                showMoreClicked()
+            }
+            true
+        }
     }
 
     private fun setUpResultPanel() {
