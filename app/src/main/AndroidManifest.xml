@@ -11,6 +11,7 @@
             android:roundIcon="@drawable/chart"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
+
         <activity
                 android:name=".view.activities.SplashActivity"
                 android:theme="@style/SplashTheme">
@@ -26,7 +27,6 @@
         <activity
                 android:name=".view.activities.StocksListActivity"
                 android:screenOrientation="portrait"/>
-
 
         <meta-data
                 android:name="preloaded_fonts"

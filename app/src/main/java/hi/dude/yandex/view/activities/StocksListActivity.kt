@@ -2,6 +2,8 @@ package hi.dude.yandex.view.activities
 
 import android.animation.AnimatorInflater
 import android.content.Context
+import android.media.AudioManager
+import android.media.session.MediaSessionManager
 import android.os.Bundle
 import android.os.Process
 import android.os.Process.myPid
