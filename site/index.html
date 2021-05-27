@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YourStocks</title>
+    <link rel="stylesheet" href="style/main.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="bg">
+    <div class="main_container">
+    
+    <h1>Разработка мобильного приложения YourStocks</h1>
+
+    <h2>Задание</h2>
+
+    <p class="top_text">
+        Необходимо создать мобильное приложение для операционной системы Android для мониторинга 
+        цен акций на бирже со следующей функциональностью:
+    </p>
+
+    <div>
+        <ul class="list">
+            <li class="list_item">
+            На стартовом экране отображается список акций. У каждой акции указан тикер, название компании, текущая цена и изменение цены за сутки.
+            </li>
+
+            <li class="list_item">
+            Пользователь может добавлять акции в избранные и отдельно просматривать этот список.
+            </li>
+
+            <li class="list_item">
+            Пользователь может искать акции по тикеру или названию и добавлять их в избранное.
+            </li>
+
+            <li class="list_item">
+            Экран с просмотром информации об акции, графиками цен за разные периоды времени, новости о компании.
+            </li>
+
+            <li class="list_item">
+            Обновление цен в реальном времени через вебсокеты.
+            </li>
+        </ul>
+    </div>
+
+    <p class="top_text">
+        Язык реализации — Kotlin. При решении можно пользоваться любыми вспомогательными библиотеками.
+    </p>
+
+    <p class="top_text">
+        Дизайн приложения выполняется по <a href="https://www.figma.com/file/bfd6MTBekSVfUYBXWYnj1U/ШМР-Тестовое?node-id=1%3A148">макету</a>
+    </p>
+
+</div>
+</div>
+
+
+<div class="main_container">
+
+
+
+    <p class="default_p">
+        YourStocks Это приложение для просмотра информации о ценных бумагах,
+        исторических данных, динамики изменения цен, ценах в реальном времени
+        и атуальных новостях. Приложение написано для операционной системы Android.
+    </p>
+
+    <div class="screen_container">
+        <div class="screen_item_left">
+            <p class="text_">Список самых популярных акций на бирже NASDAQ. </p>
+            <img class="img_r" src="images/main.jpg" alt="">
+        </div>
+
+        <hr class="my_hr">
+
+        <div class="screen_item_right">
+            <p class="text_">Поиск по компаниям или тикерам, самые популярные запросы и история запросов</p>
+            <img class="img_l" src="images/search.jpg" alt="">
+        </div>
+
+        <hr class="my_hr">
+
+        <div class="screen_item_left">
+            <p class="text_">Исторические данные о ценах акций за день, неделю, месяц, полгода, года и все время. Графики изменения цены</p>
+            <img class="img_r" src="images/chart.jpg" alt="">
+        </div>
+
+        <hr class="my_hr">
+
+        <div class="screen_item_right">
+            <p class="text_">Основновная информация о компании, ссылка на официальный сайт.</p>
+            <img class="img_l" src="images/summary.jpg" alt="">
+        </div>
+
+        <hr class="my_hr">
+
+        <div class="screen_item_left">
+            <p class="text_">Самые актуальные новости связанные с компанией, ссылки на источник.</p>
+            <img class="img_r" src="images/news.jpg" alt="">
+        </div>
+
+        <hr class="my_hr">
+
+        <div class="screen_item_right">
+            <p class="text_">Обновление цены в реальном времени через вебсокеты</p>
+            <img class="img_l" src="images/live_price.gif" alt="">
+        </div>
+
+        <hr class="my_hr">
+
+        <div class="screen_item_left">
+            <p class="text_">Возможность сохранить самые интересные преложения в избранное, все самое нужное всегда под рукой.</p>
+            <img class="img_r" src="images/favorites.jpg" alt="">
+        </div>
+    </div>
+
+    <p class="default_p_">
+        YourStocks это<br/><br/>
+        Удобный и интуитивно понятный интерфес. Минимальное время отклика. Стильный дизайн. Стабильная работа. Актуальные данные.
+    </p>
+
+    <p class="without_bg">
+        При создании проекта  были использованы самые актуальные
+        на текущий момент технологии в стеке мобильной разработки для Android.
+    </p>
+
+    <div >
+
+        <div class="screen_item_left">
+            <ul class="stack">
+                <li>Kotlin</li>
+                <li>Google Architecture Components</li>
+                <li>Room</li>
+                <li>Gson</li>
+                <li>MPAndroidChart</li>
+                <li>okhttp</li>
+                <li>Websockets</li>
+            </ul>
+
+            <ul class="stack">
+                <li>Android SDK</li>
+                <li>MVVM Architecture</li>
+                <li>SQLite</li>
+                <li>ViewPager2</li>
+                <li>Picasso</li>
+                <li>Kotlin Coroutines</li>
+                <li>Github</li>
+            </ul>
+        </div>
+
+    </div>
+
+
+    <p class="without_bg">Для получения данных о ценных бумагах использоволись открытые API,
+        а именно Finnhub API и Financial Modeling Prep API.</p>
+
+
+    <p class="without_bg">Проект выполнен в рамках проектной деятельности московского
+        политеха студентом второго курса группы 191-362 Ветровым Александром.
+        <br><br><br><a href="https://github.com/vetrov129/YandexTask">Репозиторий проекта</a></p>
+</div>
+
+</body>
+</html>

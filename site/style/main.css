@@ -1,0 +1,157 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #1A1A1A;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 500;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    color: #ffffff;
+}
+
+h2 {
+    text-align: center;
+    font-weight: 500;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    color: #ffffff;
+}
+
+a {
+    color: #f0f0f0;
+}
+
+a:visited {
+    color: #f000a0;
+}
+
+a:hover {
+    color: #a0f000;
+}
+
+a:active {
+    color: #a0f000;
+}
+
+.bg {
+    background-image: url("../images/bg.jpg"), linear-gradient(180deg, #808080, #000000);
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size: 100% 100%;
+    background-blend-mode: overlay;
+}
+
+.list {
+    padding: 1em 20px 1em 20px;
+}
+
+.list_item {
+    font-weight: 400;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.top_text {
+    font-weight: 500;
+    font-size: 26px;
+    padding: 1em 20px 1em 20px;
+    text-align: center;
+    margin-bottom: 45px;
+    color: #ffffff;
+}
+
+.main_container {
+    width: 70%;
+    margin: auto;
+}
+
+.default_p {
+    font-weight: 400;
+    font-size: 36px;
+    padding: 1em 20px 1em 20px;
+    text-align: center;
+    background: #F0F4F7;
+    border-radius: 36px;
+    margin-bottom: 65px;
+}
+
+.screen_container {
+    display: flex;
+    flex-direction: column;
+}
+
+.screen_item_left {
+    display: flex;
+    flex-direction: row;
+    align-items: center
+}
+
+.screen_item_right {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+}
+
+.img_r {
+    width: 30%;
+    height: 30%;
+    margin: 2px 86px 16px;
+    box-shadow: 12px 15px 45px rgba(0, 0, 0, 0.5);
+}
+
+.img_l {
+    width: 30%;
+    height: 30%;
+    margin: 2px 86px 16px;
+    box-shadow: -12px 15px 45px rgba(0, 0, 0, 0.5);
+}
+
+.text_ {
+    font-weight: 800;
+    text-align: center;
+    font-size: 24px;
+    font-family: 'Montserrat', sans-serif;
+    padding: 45px 16px;
+    line-height: 1.15;
+    letter-spacing: 2px;
+
+    background: #F0F4F7;
+    border-radius: 36px;
+}
+
+.my_hr {
+    border: 0;
+    height: 1px;
+    margin: 2.5em 130px;
+    background: #1A1A1A;
+}
+
+.default_p_ {
+    font-weight: 400;
+    font-size: 36px;
+    padding: 1em 20px 1em 20px;
+    text-align: center;
+    background: #F0F4F7;
+    border-radius: 36px;
+    margin-top: 65px;
+    margin-bottom: 65px;
+}
+
+.stack {
+    font-weight: 400;
+    font-size: 36px;
+    padding: 1em 20px 1em 20px;
+    list-style-type: none;
+}
+
+.without_bg {
+    font-weight: 500;
+    font-size: 26px;
+    padding: 1em 20px 1em 20px;
+    text-align: center;
+    margin-bottom: 65px;
+}

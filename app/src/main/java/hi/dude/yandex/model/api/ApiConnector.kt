@@ -26,7 +26,7 @@ class ApiConnector {
         const val API_URL = "https://financialmodelingprep.com/api/v3"
 
         val keyArray = arrayOf(
-            "a7a1e8e3e98cfe2b56b8ba42cac81c72",
+//            "a7a1e8e3e98cfe2b56b8ba42cac81c72",
             "b0bf65b946c24a87cbd7c605c0bb5239",
             "de5ebe01a82ca44a72f2a2b4d7bc67f4",
             "a2d0ac29f91142e018db0e8a586ff6ad",
@@ -103,7 +103,7 @@ class ApiConnector {
                 delay(2500)
                 getJson(request, tickerKey, tokens)
             } catch (e: FileNotFoundException) { // code 429 Too Many Requests
-                Log.i(TAG, "getJson: FileNotFoundException, try again")
+                Log.i(TAG, "getJson: FileNotFoundException, try again $url")
                 delay(1000)
                 getJson(request, tickerKey, tokens)
             }
